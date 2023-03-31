@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "714204563718",
+    "project_id": "abo-initial",
+    "storage_bucket": "abo-initial.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714204563718:android:ae2323ccabf455f8fb7687",
+        "android_client_info": {
+          "package_name": "com.example.abo_initial"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714204563718-acf176uvlt7hck0n0m8o8bq9odmd3og2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAozJZWNiJZD0jU-RCYhZQDWB7UrH0awk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714204563718-acf176uvlt7hck0n0m8o8bq9odmd3og2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
