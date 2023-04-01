@@ -19,6 +19,19 @@ class _EnterDataState extends State<EnterData> {
   String id = DateTime.now().microsecondsSinceEpoch.toString();
   //form key for form validation
   final formkey = GlobalKey<FormState>();
+  //list for dropdown button
+  List<String> bloodGroupType = [
+    "A+",
+    "A-",
+    "B+",
+    "B-",
+    "AB+",
+    "AB-",
+    "O+",
+    "O-",
+  ];
+  //here we get value of selected bloodgrop
+  String? selectedBloodGroup;
 
   @override
   void dispose() {
@@ -31,11 +44,14 @@ class _EnterDataState extends State<EnterData> {
   void dbs() {
     final user = FirebaseAuth.instance.currentUser;
     String? numb = user?.phoneNumber;
-    final dbRefrence = FirebaseDatabase.instance.ref("Data").child(numb!);
-    dbRefrence.set({
-      'id': numb,
-      'fname': fnameController.text.toString(),
-      'lname': lnameController.text.toString(),
+    String? uid = user?.uid;
+    final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrence.child(uid!).set({
+      'id': uid,
+      'fname': fnameController.text.trim(),
+      'lname': lnameController.text.trim(),
+      'number': numb,
+      'bloodgroup': selectedBloodGroup,
       // 'user': numb,
     }).then((value) {
       TostMessage().tostMessage("Record Added");
@@ -106,6 +122,25 @@ class _EnterDataState extends State<EnterData> {
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              //drop down button to select
+              DropdownButton(
+                hint: const Text('Chose Your Bloor Group'),
+                value: selectedBloodGroup,
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedBloodGroup = newValue.toString();
+                  });
+                },
+                items: bloodGroupType.map((bloodGroup) {
+                  return DropdownMenuItem(
+                    value: bloodGroup,
+                    child: Text(bloodGroup),
+                  );
+                }).toList(),
               ),
               const SizedBox(
                 height: 15,

@@ -30,7 +30,7 @@ class _DisplayUserState extends State<DisplayUser> {
   void initState() {
     super.initState();
     num = user?.phoneNumber;
-    dbShowRefrence = FirebaseDatabase.instance.ref("Data");
+    dbShowRefrence = FirebaseDatabase.instance.ref().child("Data");
   }
 
   @override
