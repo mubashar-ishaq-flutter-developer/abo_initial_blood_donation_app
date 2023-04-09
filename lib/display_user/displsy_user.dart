@@ -15,21 +15,22 @@ class DisplayUser extends StatefulWidget {
 }
 
 class _DisplayUserState extends State<DisplayUser> {
-  final user = FirebaseAuth.instance.currentUser;
-
   var dbShowRefrence;
   var reference;
-  String? num;
 
   @override
   void dispose() {
     super.dispose();
   }
 
+  String? uid;
+  String? numb;
   @override
   void initState() {
     super.initState();
-    num = user?.phoneNumber;
+    final user = FirebaseAuth.instance.currentUser;
+    numb = user?.phoneNumber;
+    uid = user?.uid;
     dbShowRefrence = FirebaseDatabase.instance.ref().child("Data");
   }
 
@@ -41,26 +42,33 @@ class _DisplayUserState extends State<DisplayUser> {
           itemBuilder: (context, snapshot, animation, index) {
             final fname = snapshot.child("fname").value.toString();
             final lname = snapshot.child("lname").value.toString();
+            final id = snapshot.child("id").value.toString();
             // final lname = snapshot.value['fname'];
-            return Container(
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  const Icon(
-                    Icons.person,
-                    size: 70,
-                  ),
-                  Text(
-                    '$fname $lname',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            if (id.contains(uid!)) {
+              return Container(
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.person,
+                      size: 70,
                     ),
-                  ),
-                ],
-              ),
-            );
+                    Text(
+                      '$fname $lname',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Container();
+            }
           }),
     );
+
+    // return Text(uid!);
   }
 }

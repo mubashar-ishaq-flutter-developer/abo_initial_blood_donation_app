@@ -1,12 +1,15 @@
 import 'package:abo_initial/add/enter_data.dart';
+import 'package:abo_initial/homepage/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
-import '../login/login_phone.dart';
 import '../tostmessage/tost_message.dart';
+import 'login_page.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
+  static String code = "";
 
   @override
   State<OtpPage> createState() => _OtpPageState();
@@ -16,9 +19,45 @@ class _OtpPageState extends State<OtpPage> {
   //auth variable
   final FirebaseAuth auth = FirebaseAuth.instance;
 
+  varifyOTP() async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: LoginPage.varify, smsCode: OtpPage.code);
+    await auth.signInWithCredential(credential).then((value) {
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const EnterData(),
+      //   ),
+      // );
+      //checking if login user hase a recod
+      final user = FirebaseAuth.instance.currentUser;
+      String? uid = user?.uid;
+      final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+      dbRefrence.child(uid!).once().then((recodKey) {
+        final snap = recodKey.snapshot;
+        if (snap.value != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const EnterData(),
+            ),
+          );
+        }
+      });
+    }).onError((FirebaseAuthException error, stackTrace) {
+      TostMessage().tostMessage(error.message);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    var code = "";
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -46,8 +85,8 @@ class _OtpPageState extends State<OtpPage> {
             children: [
               Image.asset(
                 'assets/logo_bg.png',
-                height: 180,
-                width: 180,
+                height: 150,
+                width: 150,
               ),
               const SizedBox(
                 height: 25,
@@ -72,22 +111,11 @@ class _OtpPageState extends State<OtpPage> {
               const SizedBox(
                 height: 35,
               ),
-              //Pinput(
-              // defaultPinTheme: defaultPinTheme,
-              // focusedPinTheme: focusedPinTheme,
-              // submittedPinTheme: submittedPinTheme,
-              // validator: (s) {
-              //   return s == '2222' ? null : 'Pin is incorrect';
-              // },
-              //pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
-              //showCursor: true,
-              //onCompleted: (pin) => print(pin),
-              //),
               Pinput(
                 length: 6,
                 showCursor: true,
                 onChanged: (value) {
-                  code = value;
+                  OtpPage.code = value;
                 },
               ),
               const SizedBox(
@@ -97,26 +125,8 @@ class _OtpPageState extends State<OtpPage> {
                 height: 45,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    PhoneAuthCredential credential =
-                        PhoneAuthProvider.credential(
-                            verificationId: LoginPhone.varify, smsCode: code);
-                    await auth.signInWithCredential(credential).then((value) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EnterData(),
-                        ),
-                      );
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const AddData(),
-                      //   ),
-                      // );
-                    }).onError((FirebaseAuthException error, stackTrace) {
-                      TostMessage().tostMessage(error.message);
-                    });
+                  onPressed: () {
+                    varifyOTP();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -133,24 +143,6 @@ class _OtpPageState extends State<OtpPage> {
                   ),
                 ),
               ),
-
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     const Text("Want to change Number ?"),
-              //     TextButton(
-              //       onPressed: () {
-              //         Navigator.pushAndRemoveUntil(
-              //             context,
-              //             MaterialPageRoute(
-              //               builder: (context) => const LoginPage(),
-              //             ),
-              //             (route) => false);
-              //       },
-              //       child: const Text('Edit'),
-              //     ),
-              //   ],
-              // ),
               Row(
                 children: [
                   TextButton(
@@ -159,7 +151,7 @@ class _OtpPageState extends State<OtpPage> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const LoginPhone(),
+                            builder: (context) => const LoginPage(),
                           ),
                           (route) => false);
                     },
@@ -169,58 +161,6 @@ class _OtpPageState extends State<OtpPage> {
                   ),
                 ],
               ),
-              //   Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       SizedBox(
-              //         height: 45,
-              //         width: 150,
-              //         child: ElevatedButton(
-              //           onPressed: () {
-              //             Navigator.pushNamed(context, "otp_page");
-              //           },
-              //           child: Text(
-              //             "Send Code",
-              //           ),
-              //           style: ElevatedButton.styleFrom(
-              //             primary: Colors.blue,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //             textStyle: TextStyle(
-              //               fontSize: 18,
-              //               fontWeight: FontWeight.bold,
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       SizedBox(
-              //         width: 15,
-              //       ),
-              //       SizedBox(
-              //         height: 45,
-              //         width: 150,
-              //         child: ElevatedButton(
-              //           onPressed: () {
-              //             Navigator.pushNamed(context, "otp_page");
-              //           },
-              //           child: Text(
-              //             "Send Code",
-              //           ),
-              //           style: ElevatedButton.styleFrom(
-              //             primary: Colors.blue,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //             textStyle: TextStyle(
-              //               fontSize: 18,
-              //               fontWeight: FontWeight.bold,
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
             ],
           ),
         ),

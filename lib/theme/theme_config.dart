@@ -13,7 +13,6 @@ class Themes {
       cursorColor: Colors.red,
     ),
     brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.red),
   );
   ThemeData darkTheme = ThemeData(
     primaryColor: Colors.red,
