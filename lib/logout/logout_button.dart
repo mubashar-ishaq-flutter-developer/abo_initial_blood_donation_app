@@ -1,7 +1,7 @@
+import 'package:abo_initial/login/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../login/login_phone.dart';
 import '../tostmessage/tost_message.dart';
 
 class LogoutButton extends StatefulWidget {
@@ -31,7 +31,7 @@ class _LogoutButtonState extends State<LogoutButton> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const LoginPhone(),
+              builder: (context) => const LoginPage(),
             ),
           );
         }).onError((FirebaseAuthException error, stackTrace) {

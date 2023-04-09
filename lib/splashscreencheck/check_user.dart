@@ -1,8 +1,8 @@
-import 'package:abo_initial/add/enter_data.dart';
-import 'package:abo_initial/check_record/check_user_data.dart';
-import 'package:abo_initial/login/login_phone.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../homepage/home_page.dart';
+import '../login/login_page.dart';
 
 class CheckUser extends StatelessWidget {
   const CheckUser({super.key});
@@ -14,9 +14,9 @@ class CheckUser extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return const EnterData();
+            return const HomePage();
           } else {
-            return const LoginPhone();
+            return const LoginPage();
           }
         },
       ),
