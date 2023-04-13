@@ -143,23 +143,22 @@ class _OtpPageState extends State<OtpPage> {
                   ),
                 ),
               ),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      TostMessage().tostMessage("Login Successfully!");
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
-                          (route) => false);
-                    },
-                    child: const Text(
-                      "Edit Phone Number?",
-                    ),
+              TextButton(
+                onPressed: () {
+                  // TostMessage().tostMessage("Login Successfully!");
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                      (route) => false);
+                },
+                child: const Text(
+                  "Edit Phone Number?",
+                  style: TextStyle(
+                    color: Colors.red,
                   ),
-                ],
+                ),
               ),
             ],
           ),

@@ -80,6 +80,9 @@ class _EnterDataState extends State<EnterData> {
                 key: formkey,
                 child: Column(
                   children: [
+                    const SizedBox(
+                      height: 10.0,
+                    ),
                     //first name
                     TextFormField(
                       controller: fnameController,
@@ -88,7 +91,7 @@ class _EnterDataState extends State<EnterData> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         hintText: 'Enter First Name',
-                        prefixIcon: const Icon(Icons.person),
+                        // prefixIcon: const Icon(Icons.person),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -110,7 +113,7 @@ class _EnterDataState extends State<EnterData> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         hintText: 'Enter your Last Name',
-                        prefixIcon: const Icon(Icons.person),
+                        // prefixIcon: const Icon(Icons.person),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
