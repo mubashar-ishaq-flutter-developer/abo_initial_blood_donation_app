@@ -41,12 +41,12 @@ class _EnterDataState extends State<EnterData> {
   }
 
 //methors to save data
-  void dbs() {
+  void dbs() async {
     final user = FirebaseAuth.instance.currentUser;
     String? numb = user?.phoneNumber;
     String? uid = user?.uid;
     final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
-    dbRefrence.child(uid!).set({
+    await dbRefrence.child(uid!).set({
       'id': uid,
       'fname': fnameController.text.trim(),
       'lname': lnameController.text.trim(),
@@ -54,6 +54,12 @@ class _EnterDataState extends State<EnterData> {
       'bloodgroup': selectedBloodGroup,
       // 'user': numb,
     }).then((value) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
       TostMessage().tostMessage("Record Added");
     }).onError((FirebaseException error, stackTrace) {
       TostMessage().tostMessage(error.message);
@@ -156,12 +162,6 @@ class _EnterDataState extends State<EnterData> {
                   onPressed: () {
                     if (formkey.currentState!.validate()) {
                       dbs();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
-                        ),
-                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
