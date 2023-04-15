@@ -41,12 +41,12 @@ class _EnterDataState extends State<EnterData> {
   }
 
 //methors to save data
-  void dbs() async {
+  void dbs() {
     final user = FirebaseAuth.instance.currentUser;
     String? numb = user?.phoneNumber;
     String? uid = user?.uid;
     final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
-    await dbRefrence.child(uid!).set({
+    dbRefrence.child(uid!).set({
       'id': uid,
       'fname': fnameController.text.trim(),
       'lname': lnameController.text.trim(),
@@ -54,12 +54,6 @@ class _EnterDataState extends State<EnterData> {
       'bloodgroup': selectedBloodGroup,
       // 'user': numb,
     }).then((value) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
       TostMessage().tostMessage("Record Added");
     }).onError((FirebaseException error, stackTrace) {
       TostMessage().tostMessage(error.message);
@@ -86,9 +80,6 @@ class _EnterDataState extends State<EnterData> {
                 key: formkey,
                 child: Column(
                   children: [
-                    const SizedBox(
-                      height: 10.0,
-                    ),
                     //first name
                     TextFormField(
                       controller: fnameController,
@@ -97,7 +88,7 @@ class _EnterDataState extends State<EnterData> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         hintText: 'Enter First Name',
-                        // prefixIcon: const Icon(Icons.person),
+                        prefixIcon: const Icon(Icons.person),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -119,7 +110,7 @@ class _EnterDataState extends State<EnterData> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         hintText: 'Enter your Last Name',
-                        // prefixIcon: const Icon(Icons.person),
+                        prefixIcon: const Icon(Icons.person),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -162,6 +153,12 @@ class _EnterDataState extends State<EnterData> {
                   onPressed: () {
                     if (formkey.currentState!.validate()) {
                       dbs();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomePage(),
+                        ),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
