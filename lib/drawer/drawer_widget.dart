@@ -1,8 +1,7 @@
 import 'package:abo_initial/logout/logout_button.dart';
 import 'package:abo_initial/theme/them_services.dart';
 import 'package:flutter/material.dart';
-
-import '../display_user/displsy_user.dart';
+import '../global/global_variable.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -15,19 +14,30 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(
+      child: ListView(
+        padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.red,
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(color: Colors.red),
+            accountName: Text(
+              "${gfname.toString()} ${glname.toString()}",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            child: Row(
-              children: const [
-                DisplayUser(),
-              ],
+            accountEmail: Text(
+              gnumber.toString(),
+              style: const TextStyle(fontSize: 18),
+            ),
+            currentAccountPicture: CircleAvatar(
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/user.png',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
-          // const DisplayUser(),
           ListTile(
             leading: const Icon(
               Icons.home,
@@ -40,12 +50,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
             ),
             onTap: () {
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => const HomePage(),
-              //   ),
-              // );
               Navigator.pop(context);
             },
           ),
