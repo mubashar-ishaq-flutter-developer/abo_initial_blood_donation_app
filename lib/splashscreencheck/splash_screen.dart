@@ -1,7 +1,7 @@
 // import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../splashscreencheck/splash_check.dart';
+import 'check_user.dart';
 // import './login_page.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,20 +12,17 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  SplashCheck splashcheck = SplashCheck();
   @override
-//   void islogin(){
-//  Timer(Duration(seconds: 3), () {
-//       Navigator.of(context).pushReplacement(
-//         MaterialPageRoute(
-//           builder: (_) => LoginPage(),
-//         ),
-//       );
-//     });
-//   }
   void initState() {
     super.initState();
-    splashcheck.islogin(context);
+    Future.delayed(const Duration(seconds: 3)).then((value) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CheckUser(),
+        ),
+      );
+    });
   }
 
   @override
