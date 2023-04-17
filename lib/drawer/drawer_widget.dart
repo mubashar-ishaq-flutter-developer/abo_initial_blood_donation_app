@@ -1,7 +1,9 @@
+import 'package:abo_initial/homepage/home_page.dart';
 import 'package:abo_initial/logout/logout_button.dart';
 import 'package:abo_initial/theme/them_services.dart';
 import 'package:flutter/material.dart';
 import '../global/global_variable.dart';
+import '../update/update_button.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -50,11 +52,17 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
             ),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
           ),
-          const LogoutButton(),
+          const UpdateButton(),
           const ThemeServices(),
+          const LogoutButton(),
         ],
       ),
     );
