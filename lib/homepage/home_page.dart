@@ -2,6 +2,7 @@ import 'package:abo_initial/drawer/drawer_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../display_user/current_user.dart';
+import '../scrollablesheet/scrollable_sheet_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,11 +23,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home Page"),
-        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       drawer: const DrawerWidget(),
-      body: const Text("this is home page"),
+      body: const ScrollableSheetWidget(),
     );
   }
 }
