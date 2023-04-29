@@ -21,9 +21,9 @@ class _ScrollableSheetWidgetState extends State<ScrollableSheetWidget> {
           minChildSize: 0.1,
           maxChildSize: 0.4,
           builder: (context, scrollController) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.black12,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: Colors.deepOrange.shade400,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(15),
                 topRight: Radius.circular(15),
               ),
