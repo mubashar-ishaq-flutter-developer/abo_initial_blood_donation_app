@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:abo_initial/scrollablesheet/scrollable_sheet_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'geolocator.dart';
+import '../assistantnt/assistant_methord.dart';
+import '../global/global_variable.dart';
 
 class MapInitialization extends StatefulWidget {
   const MapInitialization({super.key});
@@ -183,6 +185,26 @@ class _MapInitializationState extends State<MapInitialization> {
                       }
                     ]
                 ''');
+  }
+
+  Position? userCurrentPosition;
+  var geoLocator = Geolocator();
+  locateUserPosition() async {
+    Position cPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.bestForNavigation);
+    userCurrentPosition = cPosition;
+
+    LatLng latLngPosition =
+        LatLng(userCurrentPosition!.latitude, userCurrentPosition!.longitude);
+
+    CameraPosition cameraPosition =
+        CameraPosition(target: latLngPosition, zoom: 14);
+
+    MapInitialization.newGoogleMapController!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    humansReadableAddress =
+        await AssistantMethods.searchAddressForGeographicCoOrdinate(
+            userCurrentPosition!, context);
   }
 
   double bottomPaddingOfMap = 0;

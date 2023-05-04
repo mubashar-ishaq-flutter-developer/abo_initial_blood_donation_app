@@ -52,6 +52,7 @@ dependencies:
   google_maps_flutter: ^2.2.5 #google map intigraction in my app
   geolocator: ^9.0.2
   http: ^0.13.6
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:
