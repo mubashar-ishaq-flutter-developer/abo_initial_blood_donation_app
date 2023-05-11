@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../Common/global/global_variable.dart';
 import '../infoHandler/app_info.dart';
 
 class ScrollableSheetWidget extends StatefulWidget {
@@ -98,7 +99,11 @@ class _ScrollableSheetWidgetState extends State<ScrollableSheetWidget> {
                   height: 45,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        isvisible = !isvisible;
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),

@@ -1,22 +1,22 @@
-import 'package:abo_initial/global/global_variable.dart';
-import 'package:abo_initial/homepage/home_page.dart';
+import 'package:abo_initial/Common/homepage/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../drawer/drawer_widget.dart';
 import '../tostmessage/tost_message.dart';
 
-class UpdatePage extends StatefulWidget {
-  const UpdatePage({super.key});
+class EnterData extends StatefulWidget {
+  const EnterData({super.key});
 
   @override
-  State<UpdatePage> createState() => _UpdatePageState();
+  State<EnterData> createState() => _EnterDataState();
 }
 
-class _UpdatePageState extends State<UpdatePage> {
+class _EnterDataState extends State<EnterData> {
   //controller
   final fnameController = TextEditingController();
   final lnameController = TextEditingController();
+  //to generate random id
+  String id = DateTime.now().microsecondsSinceEpoch.toString();
   //form key for form validation
   final formkey = GlobalKey<FormState>();
   //list for dropdown button
@@ -40,21 +40,13 @@ class _UpdatePageState extends State<UpdatePage> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fnameController.text = gfname.toString();
-    lnameController.text = glname.toString();
-    selectedBloodGroup = gbloodgroup.toString();
-  }
-
-//methors to update data
-  void updateRecord() async {
+//methors to save data
+  void dbs() async {
     final user = FirebaseAuth.instance.currentUser;
     String? numb = user?.phoneNumber;
     String? uid = user?.uid;
     final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
-    await dbRefrence.child(uid!).update({
+    await dbRefrence.child(uid!).set({
       'id': uid,
       'fname': fnameController.text.trim(),
       'lname': lnameController.text.trim(),
@@ -68,7 +60,7 @@ class _UpdatePageState extends State<UpdatePage> {
           builder: (context) => const HomePage(),
         ),
       );
-      TostMessage().tostMessage("Record Uodated Successfully!");
+      TostMessage().tostMessage("Record Added");
     }).onError((FirebaseException error, stackTrace) {
       TostMessage().tostMessage(error.message);
     });
@@ -78,10 +70,9 @@ class _UpdatePageState extends State<UpdatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Page'),
+        title: const Text('Details Page'),
         centerTitle: true,
       ),
-      drawer: const DrawerWidget(),
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(
@@ -175,7 +166,7 @@ class _UpdatePageState extends State<UpdatePage> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (formkey.currentState!.validate()) {
-                      updateRecord();
+                      dbs();
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -188,7 +179,7 @@ class _UpdatePageState extends State<UpdatePage> {
                     ),
                     backgroundColor: Colors.red,
                   ),
-                  child: const Text("Update Data"),
+                  child: const Text("Save Data"),
                 ),
               ),
             ],

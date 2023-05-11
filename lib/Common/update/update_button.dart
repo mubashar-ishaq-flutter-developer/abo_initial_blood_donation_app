@@ -1,4 +1,4 @@
-import 'package:abo_initial/update/update_page.dart';
+import 'package:abo_initial/Common/update/update_page.dart';
 import 'package:flutter/material.dart';
 
 class UpdateButton extends StatefulWidget {

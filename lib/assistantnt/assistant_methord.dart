@@ -1,8 +1,8 @@
-import 'package:abo_initial/assistantnt/request_assistant.dart';
-import 'package:abo_initial/global/map_key.dart';
+import 'package:abo_initial/Common/global/map_key.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
+import '../Common/requestAssistant/request_assistant.dart';
 import '../infoHandler/app_info.dart';
 import '../models/directions.dart';
 

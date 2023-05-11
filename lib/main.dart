@@ -1,7 +1,7 @@
 import 'package:abo_initial/infoHandler/app_info.dart';
-import 'package:abo_initial/splashscreencheck/splash_screen.dart';
-import 'package:abo_initial/theme/theme_config.dart';
-import 'package:abo_initial/theme/theme_state.dart';
+import 'package:abo_initial/Common/splashscreencheck/splash_screen.dart';
+import 'package:abo_initial/Common/theme/theme_config.dart';
+import 'package:abo_initial/Common/theme/theme_state.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';

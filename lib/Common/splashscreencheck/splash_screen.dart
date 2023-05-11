@@ -1,6 +1,5 @@
 // import 'dart:async';
 
-import 'package:abo_initial/homepage/home_page.dart';
 import 'package:flutter/material.dart';
 import 'check_user.dart';
 // import './login_page.dart';
@@ -20,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomePage(),
+          builder: (context) => const CheckUser(),
         ),
       );
     });
