@@ -1,10 +1,12 @@
-import 'package:abo_initial/splashscreencheck/splash_screen.dart';
-import 'package:abo_initial/theme/theme_config.dart';
-import 'package:abo_initial/theme/theme_state.dart';
+import 'package:abo_initial/infoHandler/app_info.dart';
+import 'package:abo_initial/Common/splashscreencheck/splash_screen.dart';
+import 'package:abo_initial/Common/theme/theme_config.dart';
+import 'package:abo_initial/Common/theme/theme_state.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   await GetStorage.init();
@@ -20,12 +22,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      theme: Themes().lightTheme,
-      darkTheme: Themes().darkTheme,
-      themeMode: ThemeState().getThemeMode(),
-      debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => AppInfo(),
+      child: GetMaterialApp(
+        theme: Themes().lightTheme,
+        darkTheme: Themes().darkTheme,
+        themeMode: ThemeState().getThemeMode(),
+        debugShowCheckedModeBanner: false,
+        home: const SplashScreen(),
+      ),
     );
   }
 }

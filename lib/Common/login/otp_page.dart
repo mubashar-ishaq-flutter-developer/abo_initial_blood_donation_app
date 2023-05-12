@@ -1,5 +1,5 @@
-import 'package:abo_initial/add/enter_data.dart';
-import 'package:abo_initial/homepage/home_page.dart';
+import 'package:abo_initial/Common/add/enter_data.dart';
+import 'package:abo_initial/Common/homepage/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
