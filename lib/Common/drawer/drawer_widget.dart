@@ -5,17 +5,13 @@ import 'package:flutter/material.dart';
 import '../global/global_variable.dart';
 import '../update/update_button.dart';
 
-class DrawerWidget extends StatefulWidget {
-  const DrawerWidget({super.key});
-
-  @override
-  State<DrawerWidget> createState() => _DrawerWidgetState();
-}
-
-class _DrawerWidgetState extends State<DrawerWidget> {
+class DrawerWidget extends StatelessWidget {
+  final VoidCallback onPressed; //this VoidCallBack
+  const DrawerWidget({required this.onPressed, super.key});
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      // Displaying user name and its mobile number
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -40,6 +36,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
             ),
           ),
+          // clicking home button will push hime to home button
           ListTile(
             leading: const Icon(
               Icons.home,
@@ -60,9 +57,39 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               );
             },
           ),
+          //calling update button file
           const UpdateButton(),
+          //calling to change theme
           const ThemeServices(),
+          // calling logoutbutton file
           const LogoutButton(),
+          // i am using a button to shift between Donor & Seeker
+          const SizedBox(
+            height: 15,
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 15),
+            child: SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: ElevatedButton(
+                onPressed: onPressed,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+                child: isvisible == false
+                    ? const Text("Switch To Seeker")
+                    : const Text("Switch To Donor"),
+              ),
+            ),
+          ),
         ],
       ),
     );

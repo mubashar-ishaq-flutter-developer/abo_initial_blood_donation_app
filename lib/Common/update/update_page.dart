@@ -52,6 +52,7 @@ class _UpdatePageState extends State<UpdatePage> {
   void updateRecord() async {
     final user = FirebaseAuth.instance.currentUser;
     String? numb = user?.phoneNumber;
+    //uid contain current user id
     String? uid = user?.uid;
     final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
     await dbRefrence.child(uid!).update({
@@ -60,7 +61,7 @@ class _UpdatePageState extends State<UpdatePage> {
       'lname': lnameController.text.trim(),
       'number': numb,
       'bloodgroup': selectedBloodGroup,
-      // 'user': numb,
+      // if update is successfull then it push hime to homePage
     }).then((value) {
       Navigator.pushReplacement(
         context,
@@ -68,7 +69,9 @@ class _UpdatePageState extends State<UpdatePage> {
           builder: (context) => const HomePage(),
         ),
       );
+      //displaying tost message that update is successfull
       TostMessage().tostMessage("Record Uodated Successfully!");
+      // if some error arrive then
     }).onError((FirebaseException error, stackTrace) {
       TostMessage().tostMessage(error.message);
     });
@@ -81,7 +84,9 @@ class _UpdatePageState extends State<UpdatePage> {
         title: const Text('Update Page'),
         centerTitle: true,
       ),
-      drawer: const DrawerWidget(),
+      drawer: DrawerWidget(
+        onPressed: () {},
+      ),
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(
