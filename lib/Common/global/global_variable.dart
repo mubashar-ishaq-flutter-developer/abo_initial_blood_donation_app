@@ -7,15 +7,13 @@ String? gfname;
 String? glname;
 String? gnumber;
 String? gbloodgroup;
-String? humansReadableAddress;
+// this is to hide $ show some widgets and also to switch between user
 bool isvisible = true;
-bool isvisibles = false;
 // getting donor position
 Position? donorCurrentPosition;
-
 // initializing map controller
 GoogleMapController? newGoogleMapController;
 // finding if donor is active or not
 bool isDonorActive = false;
-//  for stream position
+// for stream position
 StreamSubscription<Position>? streamSubscriptionPosition;

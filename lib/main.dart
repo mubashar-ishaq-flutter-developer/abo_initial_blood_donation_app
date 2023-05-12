@@ -1,4 +1,4 @@
-import 'package:abo_initial/infoHandler/app_info.dart';
+import 'package:abo_initial/Seeker/infoHandler/app_info.dart';
 import 'package:abo_initial/Common/splashscreencheck/splash_screen.dart';
 import 'package:abo_initial/Common/theme/theme_config.dart';
 import 'package:abo_initial/Common/theme/theme_state.dart';

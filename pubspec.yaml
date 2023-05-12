@@ -41,10 +41,8 @@ dependencies:
   cloud_firestore: ^4.1.0
   fluttertoast: ^8.1.1
   pinput: ^2.2.16
-  fl_country_code_picker: ^0.0.4
   firebase_database: ^10.0.6
   intl: ^0.17.0
-  day_night_switcher: ^0.2.0+1
   shared_preferences: ^2.0.20
   get: ^4.6.5
   get_storage: ^2.1.1
@@ -53,6 +51,7 @@ dependencies:
   geolocator: ^9.0.2
   http: ^0.13.6
   provider: ^6.0.5
+  flutter_polyline_points: ^1.0.0 # for polyline points
   flutter_geofire: ^2.0.3 #to get realtime location of driver
 
 dev_dependencies:
