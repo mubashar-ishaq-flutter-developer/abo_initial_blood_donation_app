@@ -17,3 +17,5 @@ GoogleMapController? newGoogleMapController;
 bool isDonorActive = false;
 // for stream position
 StreamSubscription<Position>? streamSubscriptionPosition;
+//online/active donors info list
+List dList = [];

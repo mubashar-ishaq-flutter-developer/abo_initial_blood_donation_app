@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:abo_initial/Seeker/map/select_nearest_active_donors_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +50,7 @@ class _MapInitializationState extends State<MapInitialization> {
   Set<Circle> circlesSet = {};
 
   BitmapDescriptor? activeNearbyIcon;
-
+  List<ActiveNearbyAvailableDonors> onlineNearByAvailableDonorsList = [];
   bool activeNearbyDonorKeysLoaded = false;
 
   locateUserPosition() async {
@@ -71,6 +74,59 @@ class _MapInitializationState extends State<MapInitialization> {
             userCurrentPosition!, context);
 
     initializeGeoFireListener();
+  }
+
+  saveSeekerRequestInformation() {
+    //1. save the seeker request information
+    onlineNearByAvailableDonorsList =
+        GeoFireAssistant.activeNearbyAvailableDonorsList;
+    searchNearestOnlineDonors();
+  }
+
+  searchNearestOnlineDonors() async {
+    //2. cancel the seeker request
+    //when no online donor available
+    if (onlineNearByAvailableDonorsList.length == 0) {
+      setState(() {
+        polyLineSet.clear();
+        markersSet.clear();
+        circlesSet.clear();
+        pLineCoOrdinatesList.clear();
+      });
+
+      Fluttertoast.showToast(
+          msg:
+              "No Online Nearest Driver Available. Search Again after some time, Restarting App Now.");
+
+      // Future.delayed(const Duration(milliseconds: 4000), () {
+      //   // MyApp.restartApp(context);
+      // });
+
+      return;
+    }
+    //passing the list of donors
+    //active donor availabe
+    await retrieveOnlineDonorsInformation(onlineNearByAvailableDonorsList);
+    Navigator.push(context,
+        MaterialPageRoute(builder: (c) => SelectNearestActiveDonorsScreen()));
+  }
+
+  //display the list of online donors
+  retrieveOnlineDonorsInformation(List onlineNearestDonorsList) async {
+    // DatabaseReference ref = FirebaseDatabase.instance.ref().child("data")
+    final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+    //loop for all donors
+    for (int i = 0; i < onlineNearestDonorsList.length; i++) {
+      await dbRefrence
+          .child(onlineNearestDonorsList[i].donorId.toString())
+          .once()
+          .then((dataSnapshot) {
+        var donorKeyInfo = dataSnapshot.snapshot.value;
+        dList.add(donorKeyInfo);
+        //display the donor information
+        print("donorKey Information =" + dList.toString());
+      });
+    }
   }
 
   @override
@@ -230,7 +286,18 @@ class _MapInitializationState extends State<MapInitialization> {
                       const SizedBox(height: 16.0),
 
                       ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if (Provider.of<AppInfo>(context, listen: false)
+                                    .userDropOffLocation !=
+                                null) {
+                              saveSeekerRequestInformation();
+                            }
+                            //if dropoff location is eqaul to null
+                            else {
+                              Fluttertoast.showToast(
+                                  msg: "Please select destination position");
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
