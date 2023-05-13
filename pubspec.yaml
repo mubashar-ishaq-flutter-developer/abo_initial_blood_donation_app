@@ -53,6 +53,7 @@ dependencies:
   provider: ^6.0.5
   flutter_polyline_points: ^1.0.0 # for polyline points
   flutter_geofire: ^2.0.3 #to get realtime location of driver
+  smooth_star_rating_nsafe: ^1.0.0+1 #for ratting system
 
 dev_dependencies:
   flutter_test:
