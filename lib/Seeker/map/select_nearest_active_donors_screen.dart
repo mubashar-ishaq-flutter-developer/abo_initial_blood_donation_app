@@ -1,3 +1,5 @@
+import 'package:abo_initial/Common/tostmessage/tost_message.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
@@ -5,7 +7,8 @@ import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 import '../../Common/global/global_variable.dart';
 
 class SelectNearestActiveDonorsScreen extends StatefulWidget {
-  const SelectNearestActiveDonorsScreen({super.key});
+  DatabaseReference? refrenceRideRequest;
+  SelectNearestActiveDonorsScreen({super.key, this.refrenceRideRequest});
 
   @override
   State<SelectNearestActiveDonorsScreen> createState() =>
@@ -30,7 +33,8 @@ class SelectNearestActiveDonorsScreenState
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
             //delete/remove the seeker request from database
-
+            widget.refrenceRideRequest!.remove();
+            TostMessage().tostMessage("You Cancel the Ride Request");
             SystemNavigator.pop();
           },
         ),
@@ -47,7 +51,7 @@ class SelectNearestActiveDonorsScreenState
               leading: Padding(
                 padding: const EdgeInsets.only(top: 2.0),
                 child: Image.asset(
-                  "assets/" + dList[index]["bloodgroup"].toString() + ".png",
+                  "assets/${dList[index]["bloodgroup"]}.png",
                   width: 70,
                 ),
               ),
@@ -55,14 +59,14 @@ class SelectNearestActiveDonorsScreenState
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    dList[index]["fname"],
+                    dList[index]["fname"] + dList[index]["lname"],
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black54,
                     ),
                   ),
                   Text(
-                    dList[index]["lname"],
+                    dList[index]["bloodgroup"],
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.white54,
@@ -78,27 +82,27 @@ class SelectNearestActiveDonorsScreenState
                   ),
                 ],
               ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "3",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    "13 km",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54,
-                        fontSize: 12),
-                  ),
-                ],
-              ),
+              // trailing: Column(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: const [
+              //     Text(
+              //       "3",
+              //       style: TextStyle(
+              //         fontWeight: FontWeight.bold,
+              //       ),
+              //     ),
+              //     SizedBox(
+              //       height: 2,
+              //     ),
+              //     Text(
+              //       "13 km",
+              //       style: TextStyle(
+              //           fontWeight: FontWeight.bold,
+              //           color: Colors.black54,
+              //           fontSize: 12),
+              //     ),
+              //   ],
+              // ),
             ),
           );
         },

@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:abo_initial/Seeker/map/select_nearest_active_donors_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -53,6 +56,8 @@ class _MapInitializationState extends State<MapInitialization> {
   List<ActiveNearbyAvailableDonors> onlineNearByAvailableDonorsList = [];
   bool activeNearbyDonorKeysLoaded = false;
 
+  DatabaseReference? refrenceRideRequest;
+
   locateUserPosition() async {
     //for getting current location of seeker
     Position cPosition = await Geolocator.getCurrentPosition(
@@ -77,6 +82,28 @@ class _MapInitializationState extends State<MapInitialization> {
   }
 
   saveSeekerRequestInformation() {
+    refrenceRideRequest =
+        FirebaseDatabase.instance.ref().child("All Ride Request").push();
+    var originLocation = Provider.of<AppInfo>(
+      context,
+      listen: false,
+    ).userPickUpLocation;
+    Map originLocationMap = {
+      //"Key" : value
+      "latitude": originLocation!.locationLatitude.toString(),
+      "longitude": originLocation.locationLongitude.toString(),
+    };
+    Map userInformationMap = {
+      "origin": originLocationMap,
+      "time": DateTime.now().toString(),
+      "fname": gfname.toString(),
+      "lname": glname.toString(),
+      "number": gnumber.toString(),
+      "originaddress": originLocation.locationName,
+      "donorid": "waiting",
+    };
+
+    refrenceRideRequest!.set(userInformationMap);
     //1. save the seeker request information
     onlineNearByAvailableDonorsList =
         GeoFireAssistant.activeNearbyAvailableDonorsList;
@@ -86,7 +113,9 @@ class _MapInitializationState extends State<MapInitialization> {
   searchNearestOnlineDonors() async {
     //2. cancel the seeker request
     //when no online donor available
-    if (onlineNearByAvailableDonorsList.length == 0) {
+    if (onlineNearByAvailableDonorsList.isEmpty) {
+      //cancel/delete Ride Information
+      refrenceRideRequest!.remove();
       setState(() {
         polyLineSet.clear();
         markersSet.clear();
@@ -94,21 +123,26 @@ class _MapInitializationState extends State<MapInitialization> {
         pLineCoOrdinatesList.clear();
       });
 
-      Fluttertoast.showToast(
-          msg:
-              "No Online Nearest Driver Available. Search Again after some time, Restarting App Now.");
+      TostMessage().tostMessage(
+          "No Online Nearest Driver Available. Search Again after some time, Restarting App Now.");
 
-      // Future.delayed(const Duration(milliseconds: 4000), () {
-      //   // MyApp.restartApp(context);
-      // });
+      Future.delayed(const Duration(milliseconds: 4000), () {
+        // MyApp.restartApp(context);
+        SystemNavigator.pop();
+      });
 
       return;
     }
     //passing the list of donors
     //active donor availabe
     await retrieveOnlineDonorsInformation(onlineNearByAvailableDonorsList);
-    Navigator.push(context,
-        MaterialPageRoute(builder: (c) => SelectNearestActiveDonorsScreen()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (c) => SelectNearestActiveDonorsScreen(
+            refrenceRideRequest: refrenceRideRequest),
+      ),
+    );
   }
 
   //display the list of online donors
@@ -123,8 +157,6 @@ class _MapInitializationState extends State<MapInitialization> {
           .then((dataSnapshot) {
         var donorKeyInfo = dataSnapshot.snapshot.value;
         dList.add(donorKeyInfo);
-        //display the donor information
-        print("donorKey Information =" + dList.toString());
       });
     }
   }
@@ -252,11 +284,11 @@ class _MapInitializationState extends State<MapInitialization> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "To",
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 12),
-                                ),
+                                // const Text(
+                                //   "To",
+                                //   style: TextStyle(
+                                //       color: Colors.grey, fontSize: 12),
+                                // ),
                                 Text(
                                   //display the seeker location in widget in human readable form
                                   Provider.of<AppInfo>(context)
@@ -287,16 +319,17 @@ class _MapInitializationState extends State<MapInitialization> {
 
                       ElevatedButton(
                           onPressed: () {
-                            if (Provider.of<AppInfo>(context, listen: false)
-                                    .userDropOffLocation !=
-                                null) {
-                              saveSeekerRequestInformation();
-                            }
-                            //if dropoff location is eqaul to null
-                            else {
-                              Fluttertoast.showToast(
-                                  msg: "Please select destination position");
-                            }
+                            // if (Provider.of<AppInfo>(context, listen: false)
+                            //         .userDropOffLocation !=
+                            //     null) {
+                            //   saveSeekerRequestInformation();
+                            // }
+                            // //if dropoff location is eqaul to null
+                            // else {
+                            //   Fluttertoast.showToast(
+                            //       msg: "Please select destination position");
+                            // }
+                            saveSeekerRequestInformation();
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
