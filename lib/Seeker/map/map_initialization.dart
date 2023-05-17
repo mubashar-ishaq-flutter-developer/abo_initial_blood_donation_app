@@ -16,7 +16,7 @@ import '../../Common/theme/map_theme.dart';
 import '../../Common/widget/progress_dialog.dart';
 import '../assistantnt/assistant_methord.dart';
 import '../assistantnt/geofire_assistant.dart';
-import '../infoHandler/app_info.dart';
+import '../../Common/infoHandler/app_info.dart';
 import '../map/search_places_screen.dart';
 import '../models/active_nearby_available_donors.dart';
 
@@ -83,7 +83,7 @@ class _MapInitializationState extends State<MapInitialization> {
 
   saveSeekerRequestInformation() {
     refrenceRideRequest =
-        FirebaseDatabase.instance.ref().child("All Ride Request").push();
+        FirebaseDatabase.instance.ref().child("All Seeker Request").push();
     var originLocation = Provider.of<AppInfo>(
       context,
       listen: false,
@@ -518,7 +518,7 @@ class _MapInitializationState extends State<MapInitialization> {
             break;
 
           case Geofire
-              .onKeyExited: //whenever any donor become non active/offline
+                .onKeyExited: //whenever any donor become non active/offline
             GeoFireAssistant.deleteOfflineDonorFromList(map[Key]);
             displayActiveDonorsOnSeekersMap();
             break;

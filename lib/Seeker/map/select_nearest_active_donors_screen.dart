@@ -59,7 +59,7 @@ class SelectNearestActiveDonorsScreenState
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    dList[index]["fname"] + dList[index]["lname"],
+                    dList[index]["fname"] + " " + dList[index]["lname"],
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black54,

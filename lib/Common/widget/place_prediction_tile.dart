@@ -2,8 +2,8 @@ import 'package:abo_initial/Common/widget/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../Seeker/infoHandler/app_info.dart';
-import '../../Seeker/models/directions.dart';
+import '../infoHandler/app_info.dart';
+import '../model/directions.dart';
 import '../../Seeker/models/predicted_places.dart';
 import '../global/map_key.dart';
 import '../requestAssistant/request_assistant.dart';

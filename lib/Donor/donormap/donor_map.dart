@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:abo_initial/Donor/push_notifications/push_notification_system.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -45,6 +47,20 @@ class _DonorMapState extends State<DonorMap> {
 
   final DonorStatus donorStatus = DonorStatus();
   String statusText = "Now Offline";
+
+  readCurrentDonorInformation() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? uid = user?.uid;
+    PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
+    pushNotificationSystem.initializeCloudMessaging();
+    pushNotificationSystem.generateAndGetToken();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readCurrentDonorInformation();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -44,19 +44,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.red,
-          centerTitle: true,
-          title: const Text("Home Page"),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    isvisible = !isvisible;
-                  });
-                  saveVisibilityState(isvisible);
-                },
-                icon: const Icon(Icons.hide_source))
-          ]),
+        backgroundColor: Colors.red,
+        centerTitle: true,
+        title: const Text("Home Page"),
+      ),
       drawer: DrawerWidget(
         onPressed: () {
           setState(() {

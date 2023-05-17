@@ -4,9 +4,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../Common/requestAssistant/request_assistant.dart';
-import '../infoHandler/app_info.dart';
-import '../models/direction_details_info.dart';
-import '../models/directions.dart';
+import '../../Common/infoHandler/app_info.dart';
+import '../../Common/model/direction_details_info.dart';
+import '../../Common/model/directions.dart';
 
 class AssistantMethods {
   static Future<String> searchAddressForGeographicCoOrdinate(

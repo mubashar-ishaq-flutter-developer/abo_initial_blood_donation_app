@@ -1,18 +1,27 @@
 {
   "project_info": {
     "project_number": "714204563718",
+    "firebase_url": "https://abo-initial-default-rtdb.firebaseio.com",
     "project_id": "abo-initial",
     "storage_bucket": "abo-initial.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:714204563718:android:ae2323ccabf455f8fb7687",
+        "mobilesdk_app_id": "1:714204563718:android:d62a006654d9f746fb7687",
         "android_client_info": {
           "package_name": "com.example.abo_initial"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "714204563718-4so6roftfda90i1a4c34rn9lbftcttfa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.abo_initial",
+            "certificate_hash": "584c8c238f928d8724f0b0a72d04fb2bd5e137c2"
+          }
+        },
         {
           "client_id": "714204563718-acf176uvlt7hck0n0m8o8bq9odmd3og2.apps.googleusercontent.com",
           "client_type": 3
