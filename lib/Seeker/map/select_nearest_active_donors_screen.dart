@@ -7,8 +7,8 @@ import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 import '../../Common/global/global_variable.dart';
 
 class SelectNearestActiveDonorsScreen extends StatefulWidget {
-  DatabaseReference? refrenceRideRequest;
-  SelectNearestActiveDonorsScreen({super.key, this.refrenceRideRequest});
+  final DatabaseReference? refrenceRideRequest;
+  const SelectNearestActiveDonorsScreen({super.key, this.refrenceRideRequest});
 
   @override
   State<SelectNearestActiveDonorsScreen> createState() =>

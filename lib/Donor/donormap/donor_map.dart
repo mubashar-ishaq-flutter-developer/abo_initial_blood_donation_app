@@ -52,7 +52,7 @@ class _DonorMapState extends State<DonorMap> {
     final user = FirebaseAuth.instance.currentUser;
     String? uid = user?.uid;
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
-    pushNotificationSystem.initializeCloudMessaging();
+    pushNotificationSystem.initializeCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
   }
 

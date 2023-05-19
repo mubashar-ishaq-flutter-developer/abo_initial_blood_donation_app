@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -19,3 +20,5 @@ bool isDonorActive = false;
 StreamSubscription<Position>? streamSubscriptionPosition;
 //online/active donors info list
 List dList = [];
+//for audio file to play as notification
+AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();

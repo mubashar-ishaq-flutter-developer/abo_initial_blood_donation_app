@@ -82,8 +82,10 @@ class _MapInitializationState extends State<MapInitialization> {
   }
 
   saveSeekerRequestInformation() {
-    refrenceRideRequest =
-        FirebaseDatabase.instance.ref().child("All Seeker Request").push();
+    refrenceRideRequest = FirebaseDatabase.instance
+        .ref()
+        .child("All Seeker Donation Request")
+        .push();
     var originLocation = Provider.of<AppInfo>(
       context,
       listen: false,
