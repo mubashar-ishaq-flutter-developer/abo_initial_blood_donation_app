@@ -6,7 +6,7 @@ import '../infoHandler/app_info.dart';
 import '../model/directions.dart';
 import '../../Seeker/models/predicted_places.dart';
 import '../global/map_key.dart';
-import '../requestAssistant/request_assistant.dart';
+import '../assistant/request_assistant.dart';
 
 //https://developers.google.com/maps/documentation/places/web-service/autocomplete#:~:text=The%20Place%20Autocomplete%20service%20is,string%20and%20optional%20geographic%20bounds.
 //https://developers.google.com/maps/documentation/places/web-service/place-id
@@ -20,17 +20,17 @@ class PlacePredictionTileDesign extends StatelessWidget {
     //dialog for location getting
     showDialog(
       context: context,
-      builder: (BuildContext context) => ProgressDialog(
+      builder: (BuildContext context) => const ProgressDialog(
         message: "Setting Up Drof-Off!",
       ),
     );
     //paste placeid api link
-    String PlaceDirectionDetailsUrl =
+    String placeDirectionDetailsUrl =
         "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
 
     //wait for api response
     var responceApi =
-        await RequestAssistant.receiveRequest(PlaceDirectionDetailsUrl);
+        await RequestAssistant.receiveRequest(placeDirectionDetailsUrl);
 
     Navigator.pop(context);
 

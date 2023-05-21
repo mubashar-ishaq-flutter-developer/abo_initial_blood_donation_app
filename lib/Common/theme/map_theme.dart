@@ -1,8 +1,5 @@
-import '../global/global_variable.dart';
-
-class MapTheme {
-  static blackThemeGoogleMap() {
-    newGoogleMapController!.setMapStyle('''
+blackThemeGoogleMap(newGoogleMapController) {
+  newGoogleMapController!.setMapStyle('''
                     [
                       {
                         "elementType": "geometry",
@@ -165,5 +162,4 @@ class MapTheme {
                       }
                     ]
                 ''');
-  }
 }

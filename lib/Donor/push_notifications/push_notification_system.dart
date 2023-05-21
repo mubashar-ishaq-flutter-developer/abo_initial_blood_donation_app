@@ -55,7 +55,7 @@ class PushNotificationSystem {
         String fName = (snapData.snapshot.value! as Map)["fname"];
         String lName = (snapData.snapshot.value! as Map)["lname"];
         String number = (snapData.snapshot.value! as Map)["number"];
-
+        String? donateRequestId = snapData.snapshot.key;
         //storing data in seekerdonaterequestinformation for future use
         SeekerDonateRequestInformation seekerDonateRequestDetails =
             SeekerDonateRequestInformation();
@@ -65,10 +65,7 @@ class PushNotificationSystem {
         seekerDonateRequestDetails.fName = fName;
         seekerDonateRequestDetails.lName = lName;
         seekerDonateRequestDetails.number = number;
-        print("this is seeker donate request :: ");
-        print(seekerDonateRequestDetails.fName! +
-            " ${seekerDonateRequestDetails.lName}");
-        print(seekerDonateRequestDetails.originAddress);
+        seekerDonateRequestDetails.donateRequestId = donateRequestId;
 
         showDialog(
           context: context,
@@ -86,8 +83,8 @@ class PushNotificationSystem {
     final user = FirebaseAuth.instance.currentUser;
     String? uid = user?.uid;
     String? registractionToken = await messaging.getToken();
-    print("Fcm Registraction Token :");
-    print(registractionToken);
+    // print("Fcm Registraction Token :");
+    // print(registractionToken);
     final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
     dbRefrence.child(uid!).child("token").set(registractionToken);
 

@@ -4,6 +4,8 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../Donor/model/donor_data.dart';
+
 String? gfname;
 String? glname;
 String? gnumber;
@@ -22,3 +24,7 @@ StreamSubscription<Position>? streamSubscriptionPosition;
 List dList = [];
 //for audio file to play as notification
 AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
+//donor chosen id
+String? chosenDonorId = "";
+//getting online donor data
+DonorData onlineDonorData = DonorData();

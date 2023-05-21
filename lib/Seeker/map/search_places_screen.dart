@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../Common/global/map_key.dart';
-import '../../Common/requestAssistant/request_assistant.dart';
+import '../../Common/assistant/request_assistant.dart';
 import '../../Common/widget/place_prediction_tile.dart';
 import '../models/predicted_places.dart';
 

@@ -2,22 +2,19 @@ import 'dart:async';
 import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:abo_initial/Seeker/map/select_nearest_active_donors_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../Common/global/global_variable.dart';
 import '../../Common/theme/map_theme.dart';
 import '../../Common/widget/progress_dialog.dart';
-import '../assistantnt/assistant_methord.dart';
+import '../../Common/assistant/assistant_methord.dart';
 import '../assistantnt/geofire_assistant.dart';
 import '../../Common/infoHandler/app_info.dart';
-import '../map/search_places_screen.dart';
 import '../models/active_nearby_available_donors.dart';
 
 class MapInitialization extends StatefulWidget {
@@ -56,7 +53,7 @@ class _MapInitializationState extends State<MapInitialization> {
   List<ActiveNearbyAvailableDonors> onlineNearByAvailableDonorsList = [];
   bool activeNearbyDonorKeysLoaded = false;
 
-  DatabaseReference? refrenceRideRequest;
+  DatabaseReference? refrenceDonateRequest;
 
   locateUserPosition() async {
     //for getting current location of seeker
@@ -82,7 +79,7 @@ class _MapInitializationState extends State<MapInitialization> {
   }
 
   saveSeekerRequestInformation() {
-    refrenceRideRequest = FirebaseDatabase.instance
+    refrenceDonateRequest = FirebaseDatabase.instance
         .ref()
         .child("All Seeker Donation Request")
         .push();
@@ -105,7 +102,7 @@ class _MapInitializationState extends State<MapInitialization> {
       "donorid": "waiting",
     };
 
-    refrenceRideRequest!.set(userInformationMap);
+    refrenceDonateRequest!.set(userInformationMap);
     //1. save the seeker request information
     onlineNearByAvailableDonorsList =
         GeoFireAssistant.activeNearbyAvailableDonorsList;
@@ -117,7 +114,7 @@ class _MapInitializationState extends State<MapInitialization> {
     //when no online donor available
     if (onlineNearByAvailableDonorsList.isEmpty) {
       //cancel/delete Ride Information
-      refrenceRideRequest!.remove();
+      refrenceDonateRequest!.remove();
       setState(() {
         polyLineSet.clear();
         markersSet.clear();
@@ -138,13 +135,35 @@ class _MapInitializationState extends State<MapInitialization> {
     //passing the list of donors
     //active donor availabe
     await retrieveOnlineDonorsInformation(onlineNearByAvailableDonorsList);
-    Navigator.push(
+    var response = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (c) => SelectNearestActiveDonorsScreen(
-            refrenceRideRequest: refrenceRideRequest),
+            refrenceRideRequest: refrenceDonateRequest),
       ),
     );
+    if (response == "selectedDonor") {
+      final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+      dbRefrence.child(chosenDonorId!).once().then((snap) {
+        if (snap.snapshot.value != null) {
+          //send notification to specific donor
+          sendNotificationToDonorNow(chosenDonorId!);
+        } else {
+          TostMessage().tostMessage("Donor Doesnot exist. Try again.");
+        }
+      });
+    }
+  }
+
+  sendNotificationToDonorNow(String choosenDonorId) {
+    //assign/set chosenDonorId to donationStatus in data parent node for
+    //specific choosen donor
+    final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrence
+        .child(chosenDonorId!)
+        .child("donationStatus")
+        .set(refrenceDonateRequest!.key);
+    //automate push notification
   }
 
   //display the list of online donors
@@ -186,7 +205,7 @@ class _MapInitializationState extends State<MapInitialization> {
               newGoogleMapController = controller;
 
               //for black theme google map function call
-              MapTheme.blackThemeGoogleMap();
+              blackThemeGoogleMap(newGoogleMapController);
 
               setState(() {
                 bottomPaddingOfMap = 240;
@@ -231,11 +250,11 @@ class _MapInitializationState extends State<MapInitialization> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                "From",
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 12),
-                              ),
+                              // const Text(
+                              //   "From",
+                              //   style:
+                              //       TextStyle(color: Colors.grey, fontSize: 12),
+                              // ),
                               Text(
                                 Provider.of<AppInfo>(context)
                                             .userPickUpLocation !=
@@ -261,61 +280,61 @@ class _MapInitializationState extends State<MapInitialization> {
                       const SizedBox(height: 16.0),
 
                       //to
-                      GestureDetector(
-                        onTap: () async {
-                          //go to search places screen
-                          var responseFromSearchScreen = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (c) => const SearchPlacesScreen()));
+                      // GestureDetector(
+                      //   onTap: () async {
+                      //     //go to search places screen
+                      //     var responseFromSearchScreen = await Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //             builder: (c) => const SearchPlacesScreen()));
 
-                          if (responseFromSearchScreen == "obtainedDropoff") {
-                            //draw routes - draw polyline
-                            await drawPolyLineFromOriginToDestination();
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.add_location_alt_outlined,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(
-                              width: 12.0,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // const Text(
-                                //   "To",
-                                //   style: TextStyle(
-                                //       color: Colors.grey, fontSize: 12),
-                                // ),
-                                Text(
-                                  //display the seeker location in widget in human readable form
-                                  Provider.of<AppInfo>(context)
-                                              .userDropOffLocation !=
-                                          null
-                                      ? Provider.of<AppInfo>(context)
-                                          .userDropOffLocation!
-                                          .locationName!
-                                      : "Where to go?",
-                                  style: const TextStyle(
-                                      color: Colors.grey, fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                      //     if (responseFromSearchScreen == "obtainedDropoff") {
+                      //       //draw routes - draw polyline
+                      //       await drawPolyLineFromOriginToDestination();
+                      //     }
+                      //   },
+                      //   child: Row(
+                      //     children: [
+                      //       const Icon(
+                      //         Icons.add_location_alt_outlined,
+                      //         color: Colors.grey,
+                      //       ),
+                      //       const SizedBox(
+                      //         width: 12.0,
+                      //       ),
+                      //       Column(
+                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                      //         children: [
+                      //           // const Text(
+                      //           //   "To",
+                      //           //   style: TextStyle(
+                      //           //       color: Colors.grey, fontSize: 12),
+                      //           // ),
+                      //           Text(
+                      //             //display the seeker location in widget in human readable form
+                      //             Provider.of<AppInfo>(context)
+                      //                         .userDropOffLocation !=
+                      //                     null
+                      //                 ? Provider.of<AppInfo>(context)
+                      //                     .userDropOffLocation!
+                      //                     .locationName!
+                      //                 : "Where to go?",
+                      //             style: const TextStyle(
+                      //                 color: Colors.grey, fontSize: 14),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
 
-                      const SizedBox(height: 10.0),
+                      // const SizedBox(height: 10.0),
 
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
+                      // const Divider(
+                      //   height: 1,
+                      //   thickness: 1,
+                      //   color: Colors.grey,
+                      // ),
 
                       const SizedBox(height: 16.0),
 
@@ -371,7 +390,7 @@ class _MapInitializationState extends State<MapInitialization> {
     //progress dialog
     showDialog(
       context: context,
-      builder: (BuildContext context) => ProgressDialog(
+      builder: (BuildContext context) => const ProgressDialog(
         message: "Please wait...",
       ),
     );

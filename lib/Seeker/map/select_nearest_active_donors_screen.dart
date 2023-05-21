@@ -42,67 +42,75 @@ class SelectNearestActiveDonorsScreenState
       body: ListView.builder(
         itemCount: dList.length,
         itemBuilder: (BuildContext context, int index) {
-          return Card(
-            color: Colors.grey,
-            elevation: 3,
-            shadowColor: Colors.green,
-            margin: const EdgeInsets.all(8),
-            child: ListTile(
-              leading: Padding(
-                padding: const EdgeInsets.only(top: 2.0),
-                child: Image.asset(
-                  "assets/${dList[index]["bloodgroup"]}.png",
-                  width: 70,
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                chosenDonorId = dList[index]["id"].toString();
+              });
+              Navigator.pop(context, "selectedDonor");
+            },
+            child: Card(
+              color: Colors.grey,
+              elevation: 3,
+              shadowColor: Colors.green,
+              margin: const EdgeInsets.all(8),
+              child: ListTile(
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 2.0),
+                  child: Image.asset(
+                    "assets/${dList[index]["bloodgroup"]}.png",
+                    width: 70,
+                  ),
                 ),
-              ),
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    dList[index]["fname"] + " " + dList[index]["lname"],
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      dList[index]["fname"] + " " + dList[index]["lname"],
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
                     ),
-                  ),
-                  Text(
-                    dList[index]["bloodgroup"],
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white54,
+                    Text(
+                      dList[index]["bloodgroup"],
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white54,
+                      ),
                     ),
-                  ),
-                  SmoothStarRating(
-                    rating: 3.5,
-                    color: Colors.black,
-                    borderColor: Colors.black,
-                    allowHalfRating: true,
-                    starCount: 5,
-                    size: 15,
-                  ),
-                ],
+                    SmoothStarRating(
+                      rating: 3.5,
+                      color: Colors.black,
+                      borderColor: Colors.black,
+                      allowHalfRating: true,
+                      starCount: 5,
+                      size: 15,
+                    ),
+                  ],
+                ),
+                // trailing: Column(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: const [
+                //     Text(
+                //       "3",
+                //       style: TextStyle(
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //     SizedBox(
+                //       height: 2,
+                //     ),
+                //     Text(
+                //       "13 km",
+                //       style: TextStyle(
+                //           fontWeight: FontWeight.bold,
+                //           color: Colors.black54,
+                //           fontSize: 12),
+                //     ),
+                //   ],
+                // ),
               ),
-              // trailing: Column(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: const [
-              //     Text(
-              //       "3",
-              //       style: TextStyle(
-              //         fontWeight: FontWeight.bold,
-              //       ),
-              //     ),
-              //     SizedBox(
-              //       height: 2,
-              //     ),
-              //     Text(
-              //       "13 km",
-              //       style: TextStyle(
-              //           fontWeight: FontWeight.bold,
-              //           color: Colors.black54,
-              //           fontSize: 12),
-              //     ),
-              //   ],
-              // ),
             ),
           );
         },

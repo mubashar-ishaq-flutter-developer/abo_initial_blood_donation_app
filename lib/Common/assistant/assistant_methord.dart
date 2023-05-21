@@ -1,13 +1,13 @@
 import 'package:abo_initial/Common/global/map_key.dart';
-import 'package:abo_initial/Common/model/direction_details_info.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import '../../Common/infoHandler/app_info.dart';
-import '../../Common/model/directions.dart';
-import '../../Common/requestAssistant/request_assistant.dart';
+import 'request_assistant.dart';
+import '../infoHandler/app_info.dart';
+import '../model/direction_details_info.dart';
+import '../model/directions.dart';
 
-class DonorAssistantMethods {
+class AssistantMethods {
   static Future<String> searchAddressForGeographicCoOrdinate(
       Position position, context) async {
     String apiUrl =
@@ -28,19 +28,26 @@ class DonorAssistantMethods {
   }
 
   static Future<DirectionDetailsInfo?>
+      //draw polyline from pick up to destination using direction api
       obtainOriginToDestinationDirectionDetails(
           LatLng origionPosition, LatLng destinationPosition) async {
+    //direction api which we get from google cloud platform
+    //https://developers.google.com/maps/documentation/directions/start
     String urlOriginToDestinationDirectionDetails =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${origionPosition.latitude},${origionPosition.longitude}&destination=${destinationPosition.latitude},${destinationPosition.longitude}&key=$mapKey";
-
+    //wait foe api response
     var responseDirectionApi = await RequestAssistant.receiveRequest(
         urlOriginToDestinationDirectionDetails);
-
+    //if error occured
     if (responseDirectionApi == "Error Occurred, Failed. No Response.") {
       return null;
     }
 
+    //from direction details class
+
     DirectionDetailsInfo directionDetailsInfo = DirectionDetailsInfo();
+    //data in our encoded points
+    //inverted comma variables from direction api and assign them to the direction details variable
     directionDetailsInfo.e_points =
         responseDirectionApi["routes"][0]["overview_polyline"]["points"];
 
@@ -53,7 +60,7 @@ class DonorAssistantMethods {
         responseDirectionApi["routes"][0]["legs"][0]["duration"]["text"];
     directionDetailsInfo.duration_value =
         responseDirectionApi["routes"][0]["legs"][0]["duration"]["value"];
-
+    //then call it from map initialization
     return directionDetailsInfo;
   }
 }

@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:abo_initial/Donor/push_notifications/push_notification_system.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import '../../Common/assistant/assistant_methord.dart';
 import '../../Common/global/global_variable.dart';
 import '../../Common/theme/map_theme.dart';
 import '../../Common/tostmessage/tost_message.dart';
-import '../donorassistant/donor_assistant_methord.dart';
 import 'donor_status.dart';
 
 class DonorMap extends StatefulWidget {
@@ -41,7 +41,7 @@ class _DonorMapState extends State<DonorMap> {
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     String humansReadableAddress =
-        await DonorAssistantMethods.searchAddressForGeographicCoOrdinate(
+        await AssistantMethods.searchAddressForGeographicCoOrdinate(
             donorCurrentPosition!, context);
   }
 
@@ -51,6 +51,18 @@ class _DonorMapState extends State<DonorMap> {
   readCurrentDonorInformation() async {
     final user = FirebaseAuth.instance.currentUser;
     String? uid = user?.uid;
+    final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrence.child(uid!).once().then((snap) {
+      if (snap.snapshot.value != null) {
+        onlineDonorData.id = (snap.snapshot as Map)["id"];
+        onlineDonorData.fName = (snap.snapshot as Map)["fname"];
+        onlineDonorData.lName = (snap.snapshot as Map)["lname"];
+        onlineDonorData.number = (snap.snapshot as Map)["number"];
+        onlineDonorData.bloodGroup = (snap.snapshot as Map)["bloodgroup"];
+      } else {
+        TostMessage().tostMessage("No online Donor is found.");
+      }
+    });
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
     pushNotificationSystem.initializeCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
@@ -79,7 +91,7 @@ class _DonorMapState extends State<DonorMap> {
               // newGoogleMapController is importing from common global
               newGoogleMapController = controller;
               //for black theme importring from theme common
-              MapTheme.blackThemeGoogleMap();
+              blackThemeGoogleMap(newGoogleMapController);
 
               locateDonorPosition();
             },

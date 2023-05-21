@@ -1,7 +1,10 @@
 import "package:abo_initial/Common/global/global_variable.dart";
+import "package:abo_initial/Common/tostmessage/tost_message.dart";
+import 'package:abo_initial/Donor/journey_screen/new_journey_screen.dart';
 import "package:assets_audio_player/assets_audio_player.dart";
+import "package:firebase_auth/firebase_auth.dart";
+import "package:firebase_database/firebase_database.dart";
 import "package:flutter/material.dart";
-import "package:get/get.dart";
 
 import "../model/seeker_danate_request_information.dart";
 
@@ -106,7 +109,8 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                     assetsAudioPlayer.pause();
                     assetsAudioPlayer.stop();
                     assetsAudioPlayer = AssetsAudioPlayer();
-                    Navigator.pop(context);
+
+                    acceptDonationRequest(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -122,5 +126,34 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
         ),
       ),
     );
+  }
+
+  acceptDonationRequest(BuildContext context) {
+    String? getDonationRequestId;
+    final user = FirebaseAuth.instance.currentUser;
+    String? uid = user?.uid;
+    final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrence.child(uid!).child("donationStatus").once().then((snap) {
+      if (snap.snapshot.value != null) {
+        getDonationRequestId = snap.snapshot.value.toString();
+      } else {
+        TostMessage().tostMessage("Donation request ID do not exist.");
+      }
+      if (getDonationRequestId ==
+          widget.seekerDonateRequestDetails!.donateRequestId) {
+        final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+        dbRefrence.child(uid).child("donationStatus").set("accepted");
+        //Journey started and send donor to journey screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NewJourneyScreen(
+                seekerDonateRequestDetails: widget.seekerDonateRequestDetails),
+          ),
+        );
+      } else {
+        TostMessage().tostMessage("Donation Request donot exist");
+      }
+    });
   }
 }
