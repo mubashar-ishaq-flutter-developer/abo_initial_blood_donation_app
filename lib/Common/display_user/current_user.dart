@@ -25,6 +25,7 @@ class CurrentUser {
         glname = cust["lname"];
         gnumber = cust["number"];
         gbloodgroup = cust["bloodgroup"];
+        gid = cust["id"];
       }
     });
   }

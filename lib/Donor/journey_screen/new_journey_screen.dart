@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:abo_initial/Common/global/global_variable.dart';
+import 'package:abo_initial/Common/model/direction_details_info.dart';
+import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../Common/assistant/assistant_methord.dart';
 import '../../Common/theme/map_theme.dart';
@@ -30,6 +33,13 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
   List<LatLng> polyLinePositionCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
   double mapPadding = 0;
+  BitmapDescriptor? iconAnimatedMarker;
+  var geoLocator = Geolocator();
+  Position? onlineDonorCurrentPosition;
+  String rideRequestStatus = "accepted";
+  String durationFromOriginToDestination = "";
+  bool isRequestDirectionDetails = false;
+  late var directionInformation;
 
 //draw poly line
   Future<void> drawPolyLineFromOriginToDestination(
@@ -156,8 +166,95 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
     saveAssignedDonorDetailstoSeekerDonationRequest();
   }
 
+//for creating the image instead of marker
+  createDonorIconMarker() {
+    if (iconAnimatedMarker == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/origin.png")
+          .then((value) {
+        iconAnimatedMarker = value;
+      });
+    }
+  }
+
+// this methord is updating the donor marker at realtime
+  getDonorLocationAtRealTime() {
+    LatLng oldLatLang = const LatLng(0, 0);
+    streamSubscriptionDonorLivePosition =
+        Geolocator.getPositionStream().listen((Position position) {
+      donorCurrentPosition = position;
+      onlineDonorCurrentPosition = position;
+
+      LatLng latLngLiveDriverPosition = LatLng(
+        onlineDonorCurrentPosition!.latitude,
+        onlineDonorCurrentPosition!.longitude,
+      );
+      Marker animatingMarker = Marker(
+        markerId: const MarkerId("AnimetedMarker"),
+        position: latLngLiveDriverPosition,
+        icon: iconAnimatedMarker!,
+        infoWindow: const InfoWindow(title: "This is Your Position"),
+      );
+      setState(() {
+        CameraPosition cameraPosition = CameraPosition(
+          target: latLngLiveDriverPosition,
+          zoom: 16,
+        );
+        newJourneyGoogleMapController!.animateCamera(
+          CameraUpdate.newCameraPosition(cameraPosition),
+        );
+        setOfMarker.removeWhere(
+            (element) => element.markerId.value == "AnimetedMarker");
+        setOfMarker.add(animatingMarker);
+      });
+      oldLatLang == latLngLiveDriverPosition;
+      updateDurationTimeAtRealTime();
+      //updatind donor location in database at realtimee
+      Map donorLatLangDataMap = {
+        "latitude": onlineDonorCurrentPosition!.latitude.toString(),
+        "longitude": onlineDonorCurrentPosition!.longitude.toString(),
+      };
+      final dbRefrence = FirebaseDatabase.instance
+          .ref()
+          .child("All Seeker Donation Request")
+          .child(widget.seekerDonateRequestDetails!.donateRequestId!);
+      dbRefrence.child("donorLocation").set(donorLatLangDataMap);
+    });
+  }
+
+  updateDurationTimeAtRealTime() async {
+    if (isRequestDirectionDetails == false) {
+      isRequestDirectionDetails = true;
+      if (onlineDonorCurrentPosition == null) {
+        return;
+      }
+      var originLatLng = LatLng(
+        onlineDonorCurrentPosition!.latitude,
+        onlineDonorCurrentPosition!.longitude,
+      );
+      var destinationLatLng = widget
+          .seekerDonateRequestDetails!.originLatling; //user PickUp Location
+
+      directionInformation =
+          await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+        originLatLng,
+        destinationLatLng!,
+      );
+
+      if (directionInformation != null) {
+        setState(() {
+          durationFromOriginToDestination =
+              directionInformation!.duration_text!;
+        });
+      }
+      isRequestDirectionDetails = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    createDonorIconMarker();
     return Scaffold(
       body: Stack(
         children: [
@@ -187,6 +284,7 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
                   widget.seekerDonateRequestDetails!.originLatling;
               drawPolyLineFromOriginToDestination(
                   donorCurrentLatLng, seekerOriginLatLng!);
+              getDonorLocationAtRealTime();
             },
           ),
           Positioned(
@@ -215,12 +313,13 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
                 ),
                 child: Column(
                   children: [
-                    const Text(
-                      "10 minuts",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.lightGreenAccent),
+                    Text(
+                      durationFromOriginToDestination,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.lightGreenAccent,
+                      ),
                     ),
                     const SizedBox(
                       height: 15,
@@ -313,6 +412,7 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
     );
   }
 
+//when user enter in this page it use initState to save these data in db
   saveAssignedDonorDetailstoSeekerDonationRequest() {
     final dbRefrence = FirebaseDatabase.instance
         .ref()
@@ -324,7 +424,7 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
     };
     dbRefrence.child("donorLocation").set(donorLocationDataMap);
     dbRefrence.child("status").set("accepted");
-    dbRefrence.child("donorId").set(onlineDonorData.id);
+    dbRefrence.child("donorid").set(onlineDonorData.id);
     dbRefrence.child("donorfName").set(onlineDonorData.fName);
     dbRefrence.child("donorlName").set(onlineDonorData.lName);
     dbRefrence.child("donorNumber").set(onlineDonorData.number);

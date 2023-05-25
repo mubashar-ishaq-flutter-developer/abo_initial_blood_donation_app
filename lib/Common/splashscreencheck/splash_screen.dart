@@ -1,6 +1,8 @@
 // import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../global/global_variable.dart';
 import 'check_user.dart';
 // import './login_page.dart';
 
@@ -23,6 +25,17 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     });
+    getVisibilityState().then((value) {
+      setState(() {
+        isvisible =
+            value; // update the visibility state with the retrieved value
+      });
+    });
+  }
+
+  Future<bool> getVisibilityState() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isVisible') ?? true;
   }
 
   @override

@@ -40,7 +40,7 @@ class _DonorMapState extends State<DonorMap> {
 
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-    String humansReadableAddress =
+    humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCoOrdinate(
             donorCurrentPosition!, context);
   }
@@ -54,11 +54,13 @@ class _DonorMapState extends State<DonorMap> {
     final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
     dbRefrence.child(uid!).once().then((snap) {
       if (snap.snapshot.value != null) {
-        onlineDonorData.id = (snap.snapshot as Map)["id"];
-        onlineDonorData.fName = (snap.snapshot as Map)["fname"];
-        onlineDonorData.lName = (snap.snapshot as Map)["lname"];
-        onlineDonorData.number = (snap.snapshot as Map)["number"];
-        onlineDonorData.bloodGroup = (snap.snapshot as Map)["bloodgroup"];
+        Map donor = snap.snapshot.value as Map;
+        donor[Key] = snap.snapshot.key;
+        onlineDonorData.id = donor["id"];
+        onlineDonorData.fName = donor["fname"];
+        onlineDonorData.lName = donor["lname"];
+        onlineDonorData.number = donor["number"];
+        onlineDonorData.bloodGroup = donor["bloodgroup"];
       } else {
         TostMessage().tostMessage("No online Donor is found.");
       }

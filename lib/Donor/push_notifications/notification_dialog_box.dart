@@ -1,5 +1,6 @@
 import "package:abo_initial/Common/global/global_variable.dart";
 import "package:abo_initial/Common/tostmessage/tost_message.dart";
+import "package:abo_initial/Donor/assistant/donor_assistant_methord.dart";
 import 'package:abo_initial/Donor/journey_screen/new_journey_screen.dart';
 import "package:assets_audio_player/assets_audio_player.dart";
 import "package:firebase_auth/firebase_auth.dart";
@@ -143,6 +144,9 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
           widget.seekerDonateRequestDetails!.donateRequestId) {
         final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
         dbRefrence.child(uid).child("donationStatus").set("accepted");
+        //we are pause live location updates so that user get
+        //its current location not changing location
+        DonorAssistantMethord.pauseLiveLocationUpdates();
         //Journey started and send donor to journey screen
         Navigator.push(
           context,

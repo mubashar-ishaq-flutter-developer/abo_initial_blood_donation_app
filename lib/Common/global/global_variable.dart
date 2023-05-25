@@ -10,16 +10,21 @@ String? gfname;
 String? glname;
 String? gnumber;
 String? gbloodgroup;
+String? gid;
 // this is to hide $ show some widgets and also to switch between user
 bool isvisible = true;
 // getting donor position
 Position? donorCurrentPosition;
 // initializing map controller
 GoogleMapController? newGoogleMapController;
+//humanReadableAddress to get location readble for normal person
+String? humanReadableAddress;
 // finding if donor is active or not
 bool isDonorActive = false;
 // for stream position
 StreamSubscription<Position>? streamSubscriptionPosition;
+//for resuming live position
+StreamSubscription<Position>? streamSubscriptionDonorLivePosition;
 //online/active donors info list
 List dList = [];
 //for audio file to play as notification

@@ -22,12 +22,12 @@ class _HomePageState extends State<HomePage> {
     final user = FirebaseAuth.instance.currentUser;
     user != null ? CurrentUser.readRecords() : null;
     checkIfLocationPermissionAllowed();
-    getVisibilityState().then((value) {
-      setState(() {
-        isvisible =
-            value; // update the visibility state with the retrieved value
-      });
-    });
+    // getVisibilityState().then((value) {
+    //   setState(() {
+    //     isvisible =
+    //         value; // update the visibility state with the retrieved value
+    //   });
+    // });
   }
 
   Future<void> saveVisibilityState(bool isVisible) async {
@@ -35,10 +35,10 @@ class _HomePageState extends State<HomePage> {
     await prefs.setBool('isVisible', isVisible);
   }
 
-  Future<bool> getVisibilityState() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('isVisible') ?? true;
-  }
+  // Future<bool> getVisibilityState() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   return prefs.getBool('isVisible') ?? true;
+  // }
 
   @override
   Widget build(BuildContext context) {

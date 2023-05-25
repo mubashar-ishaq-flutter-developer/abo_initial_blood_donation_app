@@ -71,7 +71,7 @@ class _MapInitializationState extends State<MapInitialization> {
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     //then go to the assistants method class to get humanReadableAddress
-    String humanReadableAddress =
+    humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCoOrdinate(
             userCurrentPosition!, context);
 
@@ -411,11 +411,11 @@ class _MapInitializationState extends State<MapInitialization> {
 
     if (decodedPolyLinePointsResultList.isNotEmpty) {
       //list accepts the polyline latlng
-      decodedPolyLinePointsResultList.forEach((PointLatLng pointLatLng) {
+      for (var pointLatLng in decodedPolyLinePointsResultList) {
         //get the points
         pLineCoOrdinatesList
             .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
-      });
+      }
     }
 
     polyLineSet.clear();
@@ -575,7 +575,7 @@ class _MapInitializationState extends State<MapInitialization> {
       markersSet.clear();
       circlesSet.clear();
     });
-    Set<Marker> donorsMarkerSet = Set<Marker>();
+    Set<Marker> donorsMarkerSet = <Marker>{};
 
     //contains the all near available donor
     for (ActiveNearbyAvailableDonors eachDonor
@@ -606,7 +606,7 @@ class _MapInitializationState extends State<MapInitialization> {
     if (activeNearbyIcon == null) {
       ImageConfiguration imageConfiguration =
           createLocalImageConfiguration(context, size: const Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/donor.png")
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/origin.png")
           .then((value) {
         activeNearbyIcon = value;
       });
