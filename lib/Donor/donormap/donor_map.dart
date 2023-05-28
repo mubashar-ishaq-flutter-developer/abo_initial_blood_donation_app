@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:abo_initial/Donor/push_notifications/push_notification_system.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import '../../Common/assistant/assistant_methord.dart';
 import '../../Common/global/global_variable.dart';
 import '../../Common/theme/map_theme.dart';
 import '../../Common/tostmessage/tost_message.dart';
-import '../donorassistant/donor_assistant_methord.dart';
 import 'donor_status.dart';
 
 class DonorMap extends StatefulWidget {
@@ -38,13 +40,40 @@ class _DonorMapState extends State<DonorMap> {
 
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-    String humansReadableAddress =
-        await DonorAssistantMethods.searchAddressForGeographicCoOrdinate(
+    humanReadableAddress =
+        await AssistantMethods.searchAddressForGeographicCoOrdinate(
             donorCurrentPosition!, context);
   }
 
   final DonorStatus donorStatus = DonorStatus();
-  String statusText = "Now Offline";
+
+  readCurrentDonorInformation() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? uid = user?.uid;
+    final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrence.child(uid!).once().then((snap) {
+      if (snap.snapshot.value != null) {
+        Map donor = snap.snapshot.value as Map;
+        donor[Key] = snap.snapshot.key;
+        onlineDonorData.id = donor["id"];
+        onlineDonorData.fName = donor["fname"];
+        onlineDonorData.lName = donor["lname"];
+        onlineDonorData.number = donor["number"];
+        onlineDonorData.bloodGroup = donor["bloodgroup"];
+      } else {
+        TostMessage().tostMessage("No online Donor is found.");
+      }
+    });
+    PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
+    pushNotificationSystem.initializeCloudMessaging(context);
+    pushNotificationSystem.generateAndGetToken();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readCurrentDonorInformation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +92,7 @@ class _DonorMapState extends State<DonorMap> {
               // newGoogleMapController is importing from common global
               newGoogleMapController = controller;
               //for black theme importring from theme common
-              MapTheme.blackThemeGoogleMap();
+              blackThemeGoogleMap(newGoogleMapController);
 
               locateDonorPosition();
             },
@@ -79,7 +108,9 @@ class _DonorMapState extends State<DonorMap> {
 
           //button for online offline driver
           Positioned(
-            top: statusText != "Now Online" ? 0 : 0,
+            top: statusText != "Now Online"
+                ? MediaQuery.of(context).size.height * 0.45
+                : 0,
             left: 0,
             right: 0,
             child: Row(
