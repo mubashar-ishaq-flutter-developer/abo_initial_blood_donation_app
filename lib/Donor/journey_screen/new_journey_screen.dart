@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:abo_initial/Common/global/global_variable.dart';
-import 'package:abo_initial/Common/model/direction_details_info.dart';
-import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -39,7 +37,6 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
   String rideRequestStatus = "accepted";
   String durationFromOriginToDestination = "";
   bool isRequestDirectionDetails = false;
-  late var directionInformation;
 
 //draw poly line
   Future<void> drawPolyLineFromOriginToDestination(
@@ -236,7 +233,7 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
       var destinationLatLng = widget
           .seekerDonateRequestDetails!.originLatling; //user PickUp Location
 
-      directionInformation =
+      var directionInformation =
           await AssistantMethods.obtainOriginToDestinationDirectionDetails(
         originLatLng,
         destinationLatLng!,
@@ -244,12 +241,28 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
 
       if (directionInformation != null) {
         setState(() {
-          durationFromOriginToDestination =
-              directionInformation!.duration_text!;
+          durationFromOriginToDestination = directionInformation.duration_text!;
         });
       }
       isRequestDirectionDetails = false;
     }
+  }
+
+  endTripNow() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => const ProgressDialog(
+        message: "Please wait...",
+      ),
+    );
+    final dbRefrence = FirebaseDatabase.instance
+        .ref()
+        .child("All Seeker Donation Request")
+        .child(widget.seekerDonateRequestDetails!.donateRequestId!);
+    dbRefrence.child("status").set("ended");
+    streamSubscriptionDonorLivePosition!.cancel();
+    Navigator.pop(context);
   }
 
   @override
@@ -389,7 +402,9 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
                       height: 12,
                     ),
                     ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        endTripNow();
+                      },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green),
                       icon: const Icon(Icons.directions_walk_rounded),

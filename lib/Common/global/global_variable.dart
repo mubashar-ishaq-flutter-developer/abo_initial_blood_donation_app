@@ -19,6 +19,8 @@ Position? donorCurrentPosition;
 GoogleMapController? newGoogleMapController;
 //humanReadableAddress to get location readble for normal person
 String? humanReadableAddress;
+//for donor online and offline status
+String statusText = "Now Offline";
 // finding if donor is active or not
 bool isDonorActive = false;
 // for stream position

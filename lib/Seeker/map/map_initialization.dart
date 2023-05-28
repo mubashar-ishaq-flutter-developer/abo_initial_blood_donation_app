@@ -34,7 +34,7 @@ class _MapInitializationState extends State<MapInitialization> {
   );
   //from google_maps_flutter
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
-  double searchLocationContainerHeight = 220;
+  double searchLocationContainerHeight = 180;
   //from geo locator documentation
   Position? userCurrentPosition;
   //from geolocator
@@ -208,7 +208,7 @@ class _MapInitializationState extends State<MapInitialization> {
               blackThemeGoogleMap(newGoogleMapController);
 
               setState(() {
-                bottomPaddingOfMap = 240;
+                bottomPaddingOfMap = 180;
               });
 
               locateUserPosition();
@@ -237,11 +237,12 @@ class _MapInitializationState extends State<MapInitialization> {
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   child: Column(
                     children: [
+                      const SizedBox(height: 10.0),
                       //from
                       Row(
                         children: [
                           const Icon(
-                            Icons.add_location_alt_outlined,
+                            Icons.location_on_outlined,
                             color: Colors.grey,
                           ),
                           const SizedBox(
@@ -336,7 +337,7 @@ class _MapInitializationState extends State<MapInitialization> {
                       //   color: Colors.grey,
                       // ),
 
-                      const SizedBox(height: 16.0),
+                      // const SizedBox(height: 16.0),
 
                       ElevatedButton(
                           onPressed: () {

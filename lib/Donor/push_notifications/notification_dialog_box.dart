@@ -95,6 +95,23 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                     assetsAudioPlayer.stop();
                     assetsAudioPlayer = AssetsAudioPlayer();
                     Navigator.pop(context);
+                    final user = FirebaseAuth.instance.currentUser;
+                    String? uid = user?.uid;
+                    final dbRefrence =
+                        FirebaseDatabase.instance.ref().child("Data");
+                    final databaseReference = FirebaseDatabase.instance
+                        .ref()
+                        .child("All Seeker Donation Request")
+                        .child(widget
+                            .seekerDonateRequestDetails!.donateRequestId!);
+                    databaseReference.remove().then((value) {
+                      dbRefrence
+                          .child(uid!)
+                          .child("donationStatus")
+                          .set("idle");
+                    }).onError((FirebaseAuthException error, stackTrace) {
+                      TostMessage().tostMessage(error.message);
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,

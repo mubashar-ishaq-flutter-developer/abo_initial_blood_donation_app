@@ -46,7 +46,6 @@ class _DonorMapState extends State<DonorMap> {
   }
 
   final DonorStatus donorStatus = DonorStatus();
-  String statusText = "Now Offline";
 
   readCurrentDonorInformation() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -109,7 +108,9 @@ class _DonorMapState extends State<DonorMap> {
 
           //button for online offline driver
           Positioned(
-            top: statusText != "Now Online" ? 0 : 0,
+            top: statusText != "Now Online"
+                ? MediaQuery.of(context).size.height * 0.45
+                : 0,
             left: 0,
             right: 0,
             child: Row(

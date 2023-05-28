@@ -68,25 +68,25 @@ class SelectNearestActiveDonorsScreenState
                     Text(
                       dList[index]["fname"] + " " + dList[index]["lname"],
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 20,
                         color: Colors.black54,
                       ),
                     ),
                     Text(
                       dList[index]["bloodgroup"],
                       style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white54,
+                        fontSize: 18,
+                        color: Colors.red,
                       ),
                     ),
-                    SmoothStarRating(
-                      rating: 3.5,
-                      color: Colors.black,
-                      borderColor: Colors.black,
-                      allowHalfRating: true,
-                      starCount: 5,
-                      size: 15,
-                    ),
+                    // SmoothStarRating(
+                    //   rating: 3.5,
+                    //   color: Colors.black,
+                    //   borderColor: Colors.black,
+                    //   allowHalfRating: true,
+                    //   starCount: 5,
+                    //   size: 15,
+                    // ),
                   ],
                 ),
                 // trailing: Column(
