@@ -35,3 +35,10 @@ AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
 String? chosenDonorId = "";
 //getting online donor data
 DonorData onlineDonorData = DonorData();
+//cloud messeging
+String cloudMessagingServerToken =
+    "key=AAAApknoyQY:APA91bGEL2qxE6rlhNycLRaGFbO6GeDmDuWvXnQlw4KK8pXdQw15Mdb6vsLMmmsCegN_ltLbx2hxPirrxfVuBrb3RIQS0FWbXnvevJeaY23hXkT39yBr5rrLsSr40N82Khl6XfQuPqdC";
+String userPickUpLocation = "";
+String donorFName = "";
+String donorLName = "";
+String donorBloodGroup = "";

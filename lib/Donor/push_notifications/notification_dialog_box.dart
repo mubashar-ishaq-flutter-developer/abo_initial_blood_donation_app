@@ -6,6 +6,7 @@ import "package:assets_audio_player/assets_audio_player.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:firebase_database/firebase_database.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 
 import "../model/seeker_danate_request_information.dart";
 
@@ -109,6 +110,11 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                           .child(uid!)
                           .child("donationStatus")
                           .set("idle");
+                      TostMessage().tostMessage(
+                          "Donate Request has been Cancelled Successfully!");
+                      Future.delayed(const Duration(milliseconds: 3000), () {
+                        SystemNavigator.pop();
+                      });
                     }).onError((FirebaseAuthException error, stackTrace) {
                       TostMessage().tostMessage(error.message);
                     });

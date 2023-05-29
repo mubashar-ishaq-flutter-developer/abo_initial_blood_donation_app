@@ -2,7 +2,6 @@ import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 import '../../Common/global/global_variable.dart';
 
