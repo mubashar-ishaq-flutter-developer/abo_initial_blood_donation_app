@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:abo_initial/Seeker/map/select_nearest_active_donors_screen.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,8 +14,9 @@ import '../../Common/global/global_variable.dart';
 import '../../Common/theme/map_theme.dart';
 import '../../Common/widget/progress_dialog.dart';
 import '../../Common/assistant/assistant_methord.dart';
-import '../assistantnt/geofire_assistant.dart';
 import '../../Common/infoHandler/app_info.dart';
+import '../assistant/geofire_assistant.dart';
+import '../assistant/seeker_assistant_method.dart';
 import '../models/active_nearby_available_donors.dart';
 
 class MapInitialization extends StatefulWidget {
@@ -35,6 +37,8 @@ class _MapInitializationState extends State<MapInitialization> {
   //from google_maps_flutter
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
   double searchLocationContainerHeight = 180;
+  double waitingResponseFromDonorContainerHeight = 0;
+  double assignedDonorInfoContainerHeight = 0;
   //from geo locator documentation
   Position? userCurrentPosition;
   //from geolocator
@@ -54,6 +58,13 @@ class _MapInitializationState extends State<MapInitialization> {
   bool activeNearbyDonorKeysLoaded = false;
 
   DatabaseReference? refrenceDonateRequest;
+
+  String donorAcceptStatus = "Donor is Coming";
+
+  StreamSubscription<DatabaseEvent>? tripRideRequestInfoStreamSubscription;
+
+  String userDonateRequestStatus = "";
+  bool requestPositionInfo = true;
 
   locateUserPosition() async {
     //for getting current location of seeker
@@ -103,10 +114,87 @@ class _MapInitializationState extends State<MapInitialization> {
     };
 
     refrenceDonateRequest!.set(userInformationMap);
+
+    tripRideRequestInfoStreamSubscription =
+        refrenceDonateRequest!.onValue.listen((eventSnap) {
+      if (eventSnap.snapshot.value == null) {
+        return;
+      }
+      if ((eventSnap.snapshot.value as Map)["donorfName"] != null) {
+        setState(() {
+          donorFName = (eventSnap.snapshot.value as Map)["donorfName"];
+        });
+      }
+      if ((eventSnap.snapshot.value as Map)["donorlName"] != null) {
+        setState(() {
+          donorLName = (eventSnap.snapshot.value as Map)["donorlName"];
+        });
+      }
+      if ((eventSnap.snapshot.value as Map)["donorBloodGroup"] != null) {
+        setState(() {
+          donorBloodGroup =
+              (eventSnap.snapshot.value as Map)["donorBloodGroup"];
+        });
+      }
+      if ((eventSnap.snapshot.value as Map)["status"] != null) {
+        userDonateRequestStatus =
+            (eventSnap.snapshot.value as Map)["status"].toString();
+      }
+      if ((eventSnap.snapshot.value as Map)["donorLocation"] != null) {
+        double donorCurrentPositionLatitude = double.parse(
+            (eventSnap.snapshot.value as Map)["donorLocation"]["latitude"]
+                .toString());
+        double donorCurrentPositionLongitude = double.parse(
+            (eventSnap.snapshot.value as Map)["donorLocation"]["longitude"]
+                .toString());
+
+        LatLng driverCurrentPositionLatLng =
+            LatLng(donorCurrentPositionLatitude, donorCurrentPositionLongitude);
+
+        //status = accepted
+        if (userDonateRequestStatus == "accepted") {
+          updateArrivalTimeToUserPickupLocation(driverCurrentPositionLatLng);
+        }
+
+        //status = arrived
+        if (userDonateRequestStatus == "ended") {
+          setState(() {
+            donorAcceptStatus = "Donor has Arrived";
+          });
+        }
+      }
+    });
+
     //1. save the seeker request information
     onlineNearByAvailableDonorsList =
         GeoFireAssistant.activeNearbyAvailableDonorsList;
     searchNearestOnlineDonors();
+  }
+
+  updateArrivalTimeToUserPickupLocation(driverCurrentPositionLatLng) async {
+    if (requestPositionInfo == true) {
+      requestPositionInfo = false;
+
+      LatLng userPickUpPosition =
+          LatLng(userCurrentPosition!.latitude, userCurrentPosition!.longitude);
+
+      var directionDetailsInfo =
+          await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+        driverCurrentPositionLatLng,
+        userPickUpPosition,
+      );
+
+      if (directionDetailsInfo == null) {
+        return;
+      }
+
+      setState(() {
+        donorAcceptStatus =
+            "Donor is Coming in :: ${directionDetailsInfo.duration_text}";
+      });
+
+      requestPositionInfo = true;
+    }
   }
 
   searchNearestOnlineDonors() async {
@@ -148,11 +236,55 @@ class _MapInitializationState extends State<MapInitialization> {
         if (snap.snapshot.value != null) {
           //send notification to specific donor
           sendNotificationToDonorNow(chosenDonorId!);
+
+          //Display Waiting Response from a Donor UI
+          showWaitingResponceFromDonorUI();
+
+          //Response from a Driver
+
+          final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
+          dbRefrence
+              .child(chosenDonorId!)
+              .child("donationStatus")
+              .onValue
+              .listen((eventSnapshot) {
+            //1.donor has cancel the rideRequest :: Push Notification
+            //(donationStatus = idle)
+            if (eventSnapshot.snapshot.value == "idle") {
+              TostMessage().tostMessage(
+                  "The donor has cancelled your request. Please choose another donor.");
+              Future.delayed(const Duration(milliseconds: 3000), () {
+                TostMessage().tostMessage("Please Restart App Now.");
+                SystemNavigator.pop();
+              });
+            }
+            //2.donor has accept the rideRequest :: Push Notification
+            //(donationStatus = accepted)
+            if (eventSnapshot.snapshot.value == "accepted") {
+              //design and display ui for displaying assigned donor information
+              showUIForAssignedDonorInfo();
+            }
+          });
         } else {
           TostMessage().tostMessage("Donor Doesnot exist. Try again.");
         }
       });
     }
+  }
+
+  showUIForAssignedDonorInfo() {
+    setState(() {
+      waitingResponseFromDonorContainerHeight = 0;
+      searchLocationContainerHeight = 0;
+      assignedDonorInfoContainerHeight = 240;
+    });
+  }
+
+  showWaitingResponceFromDonorUI() {
+    setState(() {
+      searchLocationContainerHeight = 0;
+      waitingResponseFromDonorContainerHeight = 220;
+    });
   }
 
   sendNotificationToDonorNow(String choosenDonorId) {
@@ -164,6 +296,29 @@ class _MapInitializationState extends State<MapInitialization> {
         .child("donationStatus")
         .set(refrenceDonateRequest!.key);
     //automate push notification
+    final dbRefrence2 = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrence2
+        .child(chosenDonorId!)
+        //captures it from db
+        .child("token")
+        .once()
+        .then((snap) {
+      if (snap.snapshot.value != null) {
+        String deviceRegistrationToken = snap.snapshot.value.toString();
+        //send notification now
+        SeekerAssistantMethod.sendNotificationToDonorNow(
+          deviceRegistrationToken,
+          refrenceDonateRequest!.key.toString(),
+          context,
+        );
+        TostMessage().tostMessage("Notification Sends Successfully");
+        // Fluttertoast.showToast(msg: "Notification Sends Successfully");
+      } else {
+        // Fluttertoast.showToast(msg: "Please Choose Another Donor.");
+        TostMessage().tostMessage("Please Choose Another Donor.");
+        return;
+      }
+    });
   }
 
   //display the list of online donors
@@ -226,7 +381,7 @@ class _MapInitializationState extends State<MapInitialization> {
               child: Container(
                 height: searchLocationContainerHeight,
                 decoration: const BoxDecoration(
-                  color: Colors.black87,
+                  color: Colors.black54,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20),
                     topLeft: Radius.circular(20),
@@ -366,6 +521,159 @@ class _MapInitializationState extends State<MapInitialization> {
                           child: const Text("Search for Donor")),
                     ],
                   ),
+                ),
+              ),
+            ),
+          ),
+          //UI for waiting response from donor
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: waitingResponseFromDonorContainerHeight,
+              decoration: const BoxDecoration(
+                color: Colors.redAccent,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(20),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      FadeAnimatedText(
+                        'Waiting for Response\nfrom Donor',
+                        duration: const Duration(seconds: 6),
+                        textAlign: TextAlign.center,
+                        textStyle: const TextStyle(
+                            fontSize: 30.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      ScaleAnimatedText(
+                        'Please wait...',
+                        duration: const Duration(seconds: 10),
+                        textAlign: TextAlign.center,
+                        textStyle: const TextStyle(
+                            fontSize: 32.0,
+                            color: Colors.white,
+                            fontFamily: 'Canterbury'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          //UI for displaying assigned donor information
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: assignedDonorInfoContainerHeight,
+              decoration: const BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(20),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //status of ride
+                    Center(
+                      child: Text(
+                        donorAcceptStatus,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white54,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+
+                    const Divider(
+                      height: 2,
+                      thickness: 2,
+                      color: Colors.white54,
+                    ),
+
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+
+                    //driver vehicle details
+                    Text(
+                      "$donorFName $donorLName",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white54,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+
+                    Text(
+                      donorBloodGroup,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white54,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    const Divider(
+                      height: 2,
+                      thickness: 2,
+                      color: Colors.white54,
+                    ),
+
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+
+                    //call driver button
+                    // Center(
+                    //   child: ElevatedButton.icon(
+                    //     onPressed: () {},
+                    //     style: ElevatedButton.styleFrom(
+                    //       backgroundColor: Colors.green,
+                    //     ),
+                    //     icon: const Icon(
+                    //       Icons.phone_android,
+                    //       color: Colors.black54,
+                    //       size: 22,
+                    //     ),
+                    //     label: const Text(
+                    //       "Call Driver",
+                    //       style: TextStyle(
+                    //         color: Colors.black54,
+                    //         fontWeight: FontWeight.bold,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
                 ),
               ),
             ),

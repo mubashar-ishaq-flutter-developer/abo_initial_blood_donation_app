@@ -1,3 +1,4 @@
+import 'package:abo_initial/Common/global/global_variable.dart';
 import 'package:abo_initial/Common/widget/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,11 +11,18 @@ import '../assistant/request_assistant.dart';
 
 //https://developers.google.com/maps/documentation/places/web-service/autocomplete#:~:text=The%20Place%20Autocomplete%20service%20is,string%20and%20optional%20geographic%20bounds.
 //https://developers.google.com/maps/documentation/places/web-service/place-id
-class PlacePredictionTileDesign extends StatelessWidget {
+class PlacePredictionTileDesign extends StatefulWidget {
   //from model class
   final PredictedPlaces? predictedPlaces;
   //constructor
   const PlacePredictionTileDesign({super.key, this.predictedPlaces});
+
+  @override
+  State<PlacePredictionTileDesign> createState() =>
+      _PlacePredictionTileDesignState();
+}
+
+class _PlacePredictionTileDesignState extends State<PlacePredictionTileDesign> {
   //method call and capture values
   getPlaceDirectionDetails(String? placeId, context) async {
     //dialog for location getting
@@ -58,6 +66,10 @@ class PlacePredictionTileDesign extends StatelessWidget {
       //now sending the location to scrollable sheet page
       Navigator.pop(context, "obtainedDropoff");
 
+      setState(() {
+        userPickUpLocation = directions.locationName!;
+      });
+
       // print("\nlocation name = " + directions.locationName!);
       // print("\nlocation lat = " + directions.locationLatitude!.toString());
       // print("\nlocation lng = " + directions.locationLongitude!.toString());
@@ -70,7 +82,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
     return ElevatedButton(
       onPressed: () {
         //get user's selected address
-        getPlaceDirectionDetails(predictedPlaces!.place_id, context);
+        getPlaceDirectionDetails(widget.predictedPlaces!.place_id, context);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.red,
@@ -95,7 +107,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                   ),
                   Text(
                     //null checks
-                    predictedPlaces!.main_text!,
+                    widget.predictedPlaces!.main_text!,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 16.0,
@@ -107,7 +119,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                   ),
                   Text(
                     //null checks
-                    predictedPlaces!.secondary_text!,
+                    widget.predictedPlaces!.secondary_text!,
                     //if text to much long it converted into dotted form
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
