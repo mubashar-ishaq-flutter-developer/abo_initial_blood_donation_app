@@ -2,12 +2,35 @@ import 'package:abo_initial/Common/homepage/home_page.dart';
 import 'package:abo_initial/Common/logout/logout_button.dart';
 import 'package:abo_initial/Common/theme/them_services.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../global/global_variable.dart';
 import '../update/update_button.dart';
 
-class DrawerWidget extends StatelessWidget {
+class DrawerWidget extends StatefulWidget {
   final VoidCallback onPressed; //this VoidCallBack
   const DrawerWidget({required this.onPressed, super.key});
+
+  @override
+  State<DrawerWidget> createState() => _DrawerWidgetState();
+}
+
+class _DrawerWidgetState extends State<DrawerWidget> {
+  @override
+  void initState() {
+    getVisibilityState().then((value) {
+      setState(() {
+        isvisible =
+            value; // update the visibility state with the retrieved value
+      });
+    });
+    super.initState();
+  }
+
+  Future<bool> getVisibilityState() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isVisible') ?? true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -73,7 +96,7 @@ class DrawerWidget extends StatelessWidget {
               width: double.infinity,
               height: 40,
               child: ElevatedButton(
-                onPressed: onPressed,
+                onPressed: widget.onPressed,
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -85,8 +108,8 @@ class DrawerWidget extends StatelessWidget {
                   backgroundColor: Colors.red,
                 ),
                 child: isvisible == false
-                    ? const Text("Switch To Seeker")
-                    : const Text("Switch To Donor"),
+                    ? const Text("Switch To Donor")
+                    : const Text("Switch To Seeker"),
               ),
             ),
           ),

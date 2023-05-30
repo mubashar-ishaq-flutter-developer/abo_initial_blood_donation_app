@@ -6,13 +6,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../Common/global/global_variable.dart';
 import '../../Common/theme/map_theme.dart';
-import '../../Common/widget/progress_dialog.dart';
 import '../../Common/assistant/assistant_methord.dart';
 import '../../Common/infoHandler/app_info.dart';
 import '../assistant/geofire_assistant.dart';
@@ -128,6 +127,11 @@ class _MapInitializationState extends State<MapInitialization> {
       if ((eventSnap.snapshot.value as Map)["donorlName"] != null) {
         setState(() {
           donorLName = (eventSnap.snapshot.value as Map)["donorlName"];
+        });
+      }
+      if ((eventSnap.snapshot.value as Map)["donorNumber"] != null) {
+        setState(() {
+          donorNumber = (eventSnap.snapshot.value as Map)["donorNumber"];
         });
       }
       if ((eventSnap.snapshot.value as Map)["donorBloodGroup"] != null) {
@@ -276,7 +280,7 @@ class _MapInitializationState extends State<MapInitialization> {
     setState(() {
       waitingResponseFromDonorContainerHeight = 0;
       searchLocationContainerHeight = 0;
-      assignedDonorInfoContainerHeight = 240;
+      assignedDonorInfoContainerHeight = 220;
     });
   }
 
@@ -363,7 +367,7 @@ class _MapInitializationState extends State<MapInitialization> {
               blackThemeGoogleMap(newGoogleMapController);
 
               setState(() {
-                bottomPaddingOfMap = 180;
+                bottomPaddingOfMap = 225;
               });
 
               locateUserPosition();
@@ -585,7 +589,7 @@ class _MapInitializationState extends State<MapInitialization> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
-                  vertical: 20,
+                  vertical: 18,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,7 +607,7 @@ class _MapInitializationState extends State<MapInitialization> {
                     ),
 
                     const SizedBox(
-                      height: 20.0,
+                      height: 13.0,
                     ),
 
                     const Divider(
@@ -613,7 +617,7 @@ class _MapInitializationState extends State<MapInitialization> {
                     ),
 
                     const SizedBox(
-                      height: 20.0,
+                      height: 13.0,
                     ),
 
                     //driver vehicle details
@@ -626,7 +630,7 @@ class _MapInitializationState extends State<MapInitialization> {
                       ),
                     ),
                     const SizedBox(
-                      height: 20.0,
+                      height: 15.0,
                     ),
 
                     Text(
@@ -639,7 +643,7 @@ class _MapInitializationState extends State<MapInitialization> {
                     ),
 
                     const SizedBox(
-                      height: 20,
+                      height: 13,
                     ),
 
                     const Divider(
@@ -649,30 +653,65 @@ class _MapInitializationState extends State<MapInitialization> {
                     ),
 
                     const SizedBox(
-                      height: 20.0,
+                      height: 13.0,
                     ),
 
-                    //call driver button
-                    // Center(
-                    //   child: ElevatedButton.icon(
-                    //     onPressed: () {},
-                    //     style: ElevatedButton.styleFrom(
-                    //       backgroundColor: Colors.green,
-                    //     ),
-                    //     icon: const Icon(
-                    //       Icons.phone_android,
-                    //       color: Colors.black54,
-                    //       size: 22,
-                    //     ),
-                    //     label: const Text(
-                    //       "Call Driver",
-                    //       style: TextStyle(
-                    //         color: Colors.black54,
-                    //         fontWeight: FontWeight.bold,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
+                    // call donor
+                    Row(
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final call = 'tel://$donorNumber';
+                            if (await canLaunch(call)) {
+                              await launch(call);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          icon: const Icon(
+                            Icons.call,
+                            color: Colors.black54,
+                            size: 22,
+                          ),
+                          label: const Text(
+                            "Call Donor",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        //end location
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            refrenceDonateRequest!.remove();
+                            Future.delayed(const Duration(milliseconds: 3000),
+                                () {
+                              SystemNavigator.pop();
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          icon: const Icon(
+                            Icons.remove_circle_outline_rounded,
+                            color: Colors.black54,
+                            size: 22,
+                          ),
+                          label: const Text(
+                            "End Location",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -683,139 +722,139 @@ class _MapInitializationState extends State<MapInitialization> {
     );
   }
 
-  //from assistant method file
-  Future<void> drawPolyLineFromOriginToDestination() async {
-    //getting the positions
+//   //from assistant method file
+//   Future<void> drawPolyLineFromOriginToDestination() async {
+//     //getting the positions
 
-    var originPosition =
-        Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
-    var destinationPosition =
-        Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+//     var originPosition =
+//         Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
+//     var destinationPosition =
+//         Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
 
-    var originLatLng = LatLng(
-        originPosition!.locationLatitude!, originPosition.locationLongitude!);
-    var destinationLatLng = LatLng(destinationPosition!.locationLatitude!,
-        destinationPosition.locationLongitude!);
-    //progress dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => const ProgressDialog(
-        message: "Please wait...",
-      ),
-    );
-//then call our method in assistant methods
-    var directionDetailsInfo =
-        await AssistantMethods.obtainOriginToDestinationDirectionDetails(
-            originLatLng, destinationLatLng);
-//send it to next file
-    Navigator.pop(context);
-//polyline points
-    PolylinePoints pPoints = PolylinePoints();
-    //decoded polyline points
+//     var originLatLng = LatLng(
+//         originPosition!.locationLatitude!, originPosition.locationLongitude!);
+//     var destinationLatLng = LatLng(destinationPosition!.locationLatitude!,
+//         destinationPosition.locationLongitude!);
+//     //progress dialog
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) => const ProgressDialog(
+//         message: "Please wait...",
+//       ),
+//     );
+// //then call our method in assistant methods
+//     var directionDetailsInfo =
+//         await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+//             originLatLng, destinationLatLng);
+// //send it to next file
+//     Navigator.pop(context);
+// //polyline points
+//     PolylinePoints pPoints = PolylinePoints();
+//     //decoded polyline points
 
-    List<PointLatLng> decodedPolyLinePointsResultList =
-        pPoints.decodePolyline(directionDetailsInfo!.e_points!);
+//     List<PointLatLng> decodedPolyLinePointsResultList =
+//         pPoints.decodePolyline(directionDetailsInfo!.e_points!);
 
-    pLineCoOrdinatesList.clear();
+//     pLineCoOrdinatesList.clear();
 
-    if (decodedPolyLinePointsResultList.isNotEmpty) {
-      //list accepts the polyline latlng
-      for (var pointLatLng in decodedPolyLinePointsResultList) {
-        //get the points
-        pLineCoOrdinatesList
-            .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
-      }
-    }
+//     if (decodedPolyLinePointsResultList.isNotEmpty) {
+//       //list accepts the polyline latlng
+//       for (var pointLatLng in decodedPolyLinePointsResultList) {
+//         //get the points
+//         pLineCoOrdinatesList
+//             .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
+//       }
+//     }
 
-    polyLineSet.clear();
+//     polyLineSet.clear();
 
-    setState(() {
-      Polyline polyline = Polyline(
-        //color of polyline
-        color: const Color.fromARGB(255, 90, 148, 249),
-        //for same id
-        polylineId: const PolylineId("PolylineID"),
-        //joint the points
-        jointType: JointType.round,
-        //joint the points
-        points: pLineCoOrdinatesList,
-        //from destination position
-        startCap: Cap.roundCap,
-        //ended with round cap
-        endCap: Cap.roundCap,
-        geodesic: true,
-      );
-      //define the property polyline for each point
-      polyLineSet.add(polyline);
-    });
-    //adjust the maps according to the lines
-    LatLngBounds boundsLatLng;
-    if (originLatLng.latitude > destinationLatLng.latitude &&
-        originLatLng.longitude > destinationLatLng.longitude) {
-      boundsLatLng =
-          LatLngBounds(southwest: destinationLatLng, northeast: originLatLng);
-    } else if (originLatLng.longitude > destinationLatLng.longitude) {
-      boundsLatLng = LatLngBounds(
-        southwest: LatLng(originLatLng.latitude, destinationLatLng.longitude),
-        northeast: LatLng(destinationLatLng.latitude, originLatLng.longitude),
-      );
-    } else if (originLatLng.latitude > destinationLatLng.latitude) {
-      boundsLatLng = LatLngBounds(
-        southwest: LatLng(destinationLatLng.latitude, originLatLng.longitude),
-        northeast: LatLng(originLatLng.latitude, destinationLatLng.longitude),
-      );
-    } else {
-      boundsLatLng =
-          LatLngBounds(southwest: originLatLng, northeast: destinationLatLng);
-    }
-    //function call
-    newGoogleMapController!
-        .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 65));
-    //upgrating the origin marker
-    Marker originMarker = Marker(
-      markerId: const MarkerId("originID"),
-      infoWindow:
-          InfoWindow(title: originPosition.locationName, snippet: "Origin"),
-      position: originLatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    );
-    //updating the destination marker
-    Marker destinationMarker = Marker(
-      markerId: const MarkerId("destinationID"),
-      infoWindow: InfoWindow(
-          title: destinationPosition.locationName, snippet: "Destination"),
-      position: destinationLatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    );
-    //setting the state
-    setState(() {
-      markersSet.add(originMarker);
-      markersSet.add(destinationMarker);
-    });
-    //origin circle modification
-    Circle originCircle = Circle(
-      circleId: const CircleId("originID"),
-      fillColor: Colors.green,
-      radius: 12,
-      strokeWidth: 3,
-      strokeColor: Colors.white,
-      center: originLatLng,
-    );
-    //destination circle modification
-    Circle destinationCircle = Circle(
-      circleId: const CircleId("destinationID"),
-      fillColor: Colors.red,
-      radius: 12,
-      strokeWidth: 3,
-      strokeColor: Colors.white,
-      center: destinationLatLng,
-    );
-    //setting the state
-    setState(() {
-      circlesSet.add(originCircle);
-      circlesSet.add(destinationCircle);
-    });
-  }
+//     setState(() {
+//       Polyline polyline = Polyline(
+//         //color of polyline
+//         color: const Color.fromARGB(255, 90, 148, 249),
+//         //for same id
+//         polylineId: const PolylineId("PolylineID"),
+//         //joint the points
+//         jointType: JointType.round,
+//         //joint the points
+//         points: pLineCoOrdinatesList,
+//         //from destination position
+//         startCap: Cap.roundCap,
+//         //ended with round cap
+//         endCap: Cap.roundCap,
+//         geodesic: true,
+//       );
+//       //define the property polyline for each point
+//       polyLineSet.add(polyline);
+//     });
+//     //adjust the maps according to the lines
+//     LatLngBounds boundsLatLng;
+//     if (originLatLng.latitude > destinationLatLng.latitude &&
+//         originLatLng.longitude > destinationLatLng.longitude) {
+//       boundsLatLng =
+//           LatLngBounds(southwest: destinationLatLng, northeast: originLatLng);
+//     } else if (originLatLng.longitude > destinationLatLng.longitude) {
+//       boundsLatLng = LatLngBounds(
+//         southwest: LatLng(originLatLng.latitude, destinationLatLng.longitude),
+//         northeast: LatLng(destinationLatLng.latitude, originLatLng.longitude),
+//       );
+//     } else if (originLatLng.latitude > destinationLatLng.latitude) {
+//       boundsLatLng = LatLngBounds(
+//         southwest: LatLng(destinationLatLng.latitude, originLatLng.longitude),
+//         northeast: LatLng(originLatLng.latitude, destinationLatLng.longitude),
+//       );
+//     } else {
+//       boundsLatLng =
+//           LatLngBounds(southwest: originLatLng, northeast: destinationLatLng);
+//     }
+//     //function call
+//     newGoogleMapController!
+//         .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 65));
+//     //upgrating the origin marker
+//     Marker originMarker = Marker(
+//       markerId: const MarkerId("originID"),
+//       infoWindow:
+//           InfoWindow(title: originPosition.locationName, snippet: "Origin"),
+//       position: originLatLng,
+//       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+//     );
+//     //updating the destination marker
+//     Marker destinationMarker = Marker(
+//       markerId: const MarkerId("destinationID"),
+//       infoWindow: InfoWindow(
+//           title: destinationPosition.locationName, snippet: "Destination"),
+//       position: destinationLatLng,
+//       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+//     );
+//     //setting the state
+//     setState(() {
+//       markersSet.add(originMarker);
+//       markersSet.add(destinationMarker);
+//     });
+//     //origin circle modification
+//     Circle originCircle = Circle(
+//       circleId: const CircleId("originID"),
+//       fillColor: Colors.green,
+//       radius: 12,
+//       strokeWidth: 3,
+//       strokeColor: Colors.white,
+//       center: originLatLng,
+//     );
+//     //destination circle modification
+//     Circle destinationCircle = Circle(
+//       circleId: const CircleId("destinationID"),
+//       fillColor: Colors.red,
+//       radius: 12,
+//       strokeWidth: 3,
+//       strokeColor: Colors.white,
+//       center: destinationLatLng,
+//     );
+//     //setting the state
+//     setState(() {
+//       circlesSet.add(originCircle);
+//       circlesSet.add(destinationCircle);
+//     });
+//   }
 
   //creating the method of geo_fire documentation
   initializeGeoFireListener() {

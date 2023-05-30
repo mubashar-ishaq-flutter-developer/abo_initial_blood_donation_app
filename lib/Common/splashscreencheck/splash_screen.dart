@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 180,
             ),
             const Text(
-              "ABO Spotter Initial",
+              "ABO Spotter",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
