@@ -662,7 +662,9 @@ class _MapInitializationState extends State<MapInitialization> {
                         ElevatedButton.icon(
                           onPressed: () async {
                             final call = 'tel://$donorNumber';
+                            // ignore: deprecated_member_use
                             if (await canLaunch(call)) {
+                              // ignore: deprecated_member_use
                               await launch(call);
                             }
                           },

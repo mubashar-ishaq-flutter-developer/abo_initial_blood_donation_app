@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class SeekerAssistantMethod {
   static sendNotificationToDonorNow(
       String deviceRegistrationToken, String donateRequestId, context) async {
-    String destinationAddress = userPickUpLocation;
+    destinationAddress = userPickUpLocation;
     Map<String, String> headerNotification = {
       'Content-Type': 'application/json',
       'Authorization': cloudMessagingServerToken,
@@ -28,7 +28,7 @@ class SeekerAssistantMethod {
       "to": deviceRegistrationToken,
     };
 
-    var reponseNotification = http.post(
+    reponseNotification = http.post(
       Uri.parse("https://fcm.googleapis.com/fcm/send"),
       headers: headerNotification,
       body: jsonEncode(officialNotificationFormat),

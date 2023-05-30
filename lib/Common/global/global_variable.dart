@@ -43,3 +43,7 @@ String donorFName = "";
 String donorLName = "";
 String donorBloodGroup = "";
 String donorNumber = "";
+//for seeker assistant method
+String? destinationAddress;
+// ignore: prefer_typing_uninitialized_variables
+var reponseNotification;

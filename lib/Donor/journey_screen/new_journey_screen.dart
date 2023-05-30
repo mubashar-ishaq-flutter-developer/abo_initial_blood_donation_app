@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../Common/assistant/assistant_methord.dart';
 import '../../Common/theme/map_theme.dart';
 import '../../Common/widget/progress_dialog.dart';
@@ -401,21 +402,54 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
                     const SizedBox(
                       height: 12,
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        endTripNow();
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green),
-                      icon: const Icon(Icons.directions_walk_rounded),
-                      label: const Text(
-                        "Arrived",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            endTripNow();
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green),
+                          icon: const Icon(Icons.directions_walk_rounded),
+                          label: const Text(
+                            "Arrived",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final call =
+                                'tel://${widget.seekerDonateRequestDetails!.number}';
+                            // ignore: deprecated_member_use
+                            if (await canLaunch(call)) {
+                              // ignore: deprecated_member_use
+                              await launch(call);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          icon: const Icon(
+                            Icons.call,
+                            color: Colors.black54,
+                            size: 22,
+                          ),
+                          label: const Text(
+                            "Call Donor",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
