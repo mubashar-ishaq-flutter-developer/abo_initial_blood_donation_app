@@ -11,7 +11,7 @@ String? glname;
 String? gnumber;
 String? gbloodgroup;
 String? gid;
-// this is to hide $ show some widgets and also to switch between user
+// this is to hide & show some widgets and also to switch between user
 bool isvisible = true;
 // getting donor position
 Position? donorCurrentPosition;
@@ -42,3 +42,4 @@ String userPickUpLocation = "";
 String donorFName = "";
 String donorLName = "";
 String donorBloodGroup = "";
+String donorNumber = "";

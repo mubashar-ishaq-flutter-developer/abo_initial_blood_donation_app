@@ -1,6 +1,7 @@
 import 'package:abo_initial/Common/drawer/drawer_widget.dart';
 import 'package:abo_initial/Seeker/map/map_initialization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../display_user/current_user.dart';
@@ -51,9 +52,14 @@ class _HomePageState extends State<HomePage> {
       drawer: DrawerWidget(
         onPressed: () {
           setState(() {
-            isvisible = !isvisible; //no need to use two booleans
+            isvisible = !isvisible;
           });
           saveVisibilityState(isvisible);
+          final user = FirebaseAuth.instance.currentUser;
+          String? uid = user?.uid;
+          final dbRefrence =
+              FirebaseDatabase.instance.ref().child("activeDonors");
+          dbRefrence.child(uid!).remove();
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -65,11 +71,11 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           Visibility(
-            visible: isvisible,
+            visible: !isvisible,
             child: const MapInitialization(),
           ),
           Visibility(
-            visible: !isvisible,
+            visible: isvisible,
             child: const DonorMap(),
           ),
         ],

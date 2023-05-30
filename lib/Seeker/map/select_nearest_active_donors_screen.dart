@@ -57,7 +57,7 @@ class SelectNearestActiveDonorsScreenState
                 leading: Padding(
                   padding: const EdgeInsets.only(top: 2.0),
                   child: Image.asset(
-                    "assets/${dList[index]["bloodgroup"]}.png",
+                    "assets/${dList[index]["bloodgroup"]}.jpg",
                     width: 70,
                   ),
                 ),

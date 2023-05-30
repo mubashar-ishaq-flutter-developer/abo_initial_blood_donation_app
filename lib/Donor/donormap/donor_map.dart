@@ -73,6 +73,21 @@ class _DonorMapState extends State<DonorMap> {
   void initState() {
     super.initState();
     readCurrentDonorInformation();
+    onlineStatus();
+  }
+
+  onlineStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? uid = user?.uid;
+    final dbRefrence = FirebaseDatabase.instance.ref().child("activeDonors");
+    await dbRefrence.child(uid!).once().then((snap) {
+      if (snap.snapshot.value != null) {
+        setState(() {
+          statusText = "Now Online";
+          isDonorActive = true;
+        });
+      }
+    });
   }
 
   @override
@@ -128,12 +143,17 @@ class _DonorMapState extends State<DonorMap> {
                       });
                       TostMessage().tostMessage("You are Online Now");
                     } //if donor is online and make him offline
-                    else {
+                    else if (isDonorActive == true) {
                       donorStatus.driverIsOfflineNow();
                       setState(() {
                         statusText = "Now Offline";
                         isDonorActive = false;
                       });
+                      final user = FirebaseAuth.instance.currentUser;
+                      String? uid = user?.uid;
+                      final dbRefrence =
+                          FirebaseDatabase.instance.ref().child("activeDonors");
+                      dbRefrence.child(uid!).remove();
                       TostMessage().tostMessage("You are Offline Now");
                     }
                   },

@@ -87,16 +87,50 @@ class _UpdatePageState extends State<UpdatePage> {
       drawer: DrawerWidget(
         onPressed: () {},
       ),
-      body: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(
-          horizontal: 30.0,
-          vertical: 10.0,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Form(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 180.0,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(320.0),
+                  bottomRight: Radius.circular(320.0),
+                ),
+              ),
+              child: const Center(
+                child: CircleAvatar(
+                  // Increase the radius to increase the size
+                  radius: 60.0,
+                  backgroundImage: AssetImage('assets/user.png'),
+                ),
+              ),
+            ),
+            // const SizedBox(
+            //   height: 33,
+            // ),
+            Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(15),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.red, //New
+                    blurRadius: 20.0,
+                  )
+                ],
+              ),
+              padding: const EdgeInsets.all(15),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 25.0,
+                vertical: 10.0,
+              ),
+              child: Form(
                 key: formkey,
                 child: Column(
                   children: [
@@ -167,37 +201,37 @@ class _UpdatePageState extends State<UpdatePage> {
                         ),
                       ),
                     ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    //button to save data
+                    SizedBox(
+                      height: 50,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (formkey.currentState!.validate()) {
+                            updateRecord();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Text("Update Data"),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
-              //button to save data
-              SizedBox(
-                height: 55,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (formkey.currentState!.validate()) {
-                      updateRecord();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                  child: const Text("Update Data"),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
