@@ -1,4 +1,5 @@
 import "package:abo_initial/Common/global/global_variable.dart";
+import "package:abo_initial/Common/homepage/home_page.dart";
 import "package:abo_initial/Common/tostmessage/tost_message.dart";
 import "package:abo_initial/Donor/assistant/donor_assistant_methord.dart";
 import 'package:abo_initial/Donor/journey_screen/new_journey_screen.dart';
@@ -112,7 +113,13 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                           .set("idle");
                       TostMessage().tostMessage(
                           "Donate Request has been Cancelled Successfully!");
-                      Future.delayed(const Duration(milliseconds: 3000), () {
+                      Future.delayed(const Duration(milliseconds: 2000), () {
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => const HomePage(),
+                        //   ),
+                        // );
                         SystemNavigator.pop();
                       });
                     }).onError((FirebaseAuthException error, stackTrace) {
@@ -171,7 +178,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
         //its current location not changing location
         DonorAssistantMethord.pauseLiveLocationUpdates();
         //Journey started and send donor to journey screen
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => NewJourneyScreen(

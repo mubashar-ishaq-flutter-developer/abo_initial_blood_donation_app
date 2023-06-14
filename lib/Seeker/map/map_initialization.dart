@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:abo_initial/Common/homepage/home_page.dart';
 import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:abo_initial/Seeker/map/select_nearest_active_donors_screen.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,15 +44,14 @@ class _MapInitializationState extends State<MapInitialization> {
   Position? userCurrentPosition;
   //from geolocator
   var geoLocator = Geolocator();
-
   // LocationPermission? _locationPermission;
   double bottomPaddingOfMap = 0;
   //for polyline points
   List<LatLng> pLineCoOrdinatesList = [];
   Set<Polyline> polyLineSet = {};
   //for polyline markers
-  Set<Marker> markersSet = {};
-  Set<Circle> circlesSet = {};
+  Set<Marker> markersSet = <Marker>{};
+  Set<Circle> circlesSet = <Circle>{};
 
   BitmapDescriptor? activeNearbyIcon;
   List<ActiveNearbyAvailableDonors> onlineNearByAvailableDonorsList = [];
@@ -158,6 +159,8 @@ class _MapInitializationState extends State<MapInitialization> {
         //status = accepted
         if (userDonateRequestStatus == "accepted") {
           updateArrivalTimeToUserPickupLocation(driverCurrentPositionLatLng);
+          //for testing
+          // TostMessage().tostMessage("testing");
         }
 
         //status = arrived
@@ -202,25 +205,42 @@ class _MapInitializationState extends State<MapInitialization> {
   }
 
   searchNearestOnlineDonors() async {
-    //2. cancel the seeker request
+    //cancel/delete Ride Information
+    // refrenceDonateRequest!.remove();
     //when no online donor available
     if (onlineNearByAvailableDonorsList.isEmpty) {
-      //cancel/delete Ride Information
-      refrenceDonateRequest!.remove();
-      setState(() {
-        polyLineSet.clear();
-        markersSet.clear();
-        circlesSet.clear();
-        pLineCoOrdinatesList.clear();
-      });
+      // setState(() {
+      //   polyLineSet.clear();
+      //   markersSet.clear();
+      //   circlesSet.clear();
+      //   pLineCoOrdinatesList.clear();
+      // });
 
       TostMessage().tostMessage(
-          "No Online Nearest Driver Available. Search Again after some time, Restarting App Now.");
-
-      Future.delayed(const Duration(milliseconds: 4000), () {
-        // MyApp.restartApp(context);
-        SystemNavigator.pop();
+          "No Online Nearest Driver Available. Search Again after some time.");
+      //cancel/delete Ride Information
+      refrenceDonateRequest!.remove().then((value) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+        );
+        return;
+      }).onError((FirebaseException exception, stackTrace) {
+        TostMessage().tostMessage(exception.message);
       });
+
+      // Future.delayed(const Duration(milliseconds: 1000), () {
+      //   // MyApp.restartApp(context);
+      //   // SystemNavigator.pop();
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(
+      //       builder: (context) => const HomePage(),
+      //     ),
+      //   );
+      // });
 
       return;
     }
@@ -257,9 +277,15 @@ class _MapInitializationState extends State<MapInitialization> {
             if (eventSnapshot.snapshot.value == "idle") {
               TostMessage().tostMessage(
                   "The donor has cancelled your request. Please choose another donor.");
-              Future.delayed(const Duration(milliseconds: 3000), () {
-                TostMessage().tostMessage("Please Restart App Now.");
-                SystemNavigator.pop();
+              Future.delayed(const Duration(milliseconds: 2000), () {
+                // TostMessage().tostMessage("Please Restart App Now.");
+                // SystemNavigator.pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomePage(),
+                  ),
+                );
               });
             }
             //2.donor has accept the rideRequest :: Push Notification
@@ -341,6 +367,18 @@ class _MapInitializationState extends State<MapInitialization> {
     }
   }
 
+  //for creating the image instead of marker
+  createActiveNearByDonorIconMarker() {
+    if (activeNearbyIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/origin.png")
+          .then((value) {
+        activeNearbyIcon = value;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     createActiveNearByDonorIconMarker();
@@ -369,7 +407,6 @@ class _MapInitializationState extends State<MapInitialization> {
               setState(() {
                 bottomPaddingOfMap = 225;
               });
-
               locateUserPosition();
             },
           ),
@@ -691,7 +728,7 @@ class _MapInitializationState extends State<MapInitialization> {
                         ElevatedButton.icon(
                           onPressed: () {
                             refrenceDonateRequest!.remove();
-                            Future.delayed(const Duration(milliseconds: 3000),
+                            Future.delayed(const Duration(milliseconds: 2000),
                                 () {
                               SystemNavigator.pop();
                             });
@@ -947,18 +984,6 @@ class _MapInitializationState extends State<MapInitialization> {
       //set the state of donor
       setState(() {
         markersSet = donorsMarkerSet;
-      });
-    }
-  }
-
-  //for creating the image instead of marker
-  createActiveNearByDonorIconMarker() {
-    if (activeNearbyIcon == null) {
-      ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context, size: const Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/origin.png")
-          .then((value) {
-        activeNearbyIcon = value;
       });
     }
   }

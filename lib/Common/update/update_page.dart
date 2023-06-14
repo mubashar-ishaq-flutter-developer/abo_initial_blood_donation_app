@@ -114,7 +114,7 @@ class _UpdatePageState extends State<UpdatePage> {
             Container(
               width: double.infinity,
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: Colors.grey,
                 borderRadius: BorderRadius.all(
                   Radius.circular(15),
                 ),

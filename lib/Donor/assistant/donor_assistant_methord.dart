@@ -7,7 +7,7 @@ class DonorAssistantMethord {
   static pauseLiveLocationUpdates() {
     final user = FirebaseAuth.instance.currentUser;
     String? uid = user?.uid;
-    streamSubscriptionPosition!.pause();
+    streamSubscriptionPosition?.pause();
     Geofire.removeLocation(uid!);
   }
 

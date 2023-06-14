@@ -18,11 +18,11 @@ class PushNotificationSystem {
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? remoteMessage) {
-      if (remoteMessage != null) {
-        //display Seeker Request information who request for blood donation
-        readSeekerDonateRequestInformation(
-            remoteMessage.data["donateRequestID"], context);
-      }
+      // if (remoteMessage != null) {
+      //display Seeker Request information who request for blood donation
+      readSeekerDonateRequestInformation(
+          remoteMessage!.data["donateRequestID"], context);
+      // }
     });
     //2.Foreground State when app is open in view & in use
     FirebaseMessaging.onMessage.listen((RemoteMessage? remoteMessage) {

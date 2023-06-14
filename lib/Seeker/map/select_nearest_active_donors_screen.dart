@@ -1,6 +1,8 @@
+import 'package:abo_initial/Common/homepage/home_page.dart';
 import 'package:abo_initial/Common/tostmessage/tost_message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import '../../Common/global/global_variable.dart';
@@ -31,10 +33,32 @@ class SelectNearestActiveDonorsScreenState
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
-            //delete/remove the seeker request from database
-            widget.refrenceRideRequest!.remove();
+            //commited to check some thing
+            // //delete/remove the seeker request from database
+            // widget.refrenceRideRequest!.remove();
+
             TostMessage().tostMessage("You Cancel the Ride Request");
-            SystemNavigator.pop();
+            //for testing purpose
+            //delete/remove the seeker request from database
+            widget.refrenceRideRequest!.remove().then(
+              (value) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomePage(),
+                  ),
+                );
+              },
+            ).onError((FirebaseException error, stackTrace) {
+              TostMessage().tostMessage(error.message);
+            });
+            // SystemNavigator.pop();
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => const HomePage(),
+            //   ),
+            // );
           },
         ),
       ),
