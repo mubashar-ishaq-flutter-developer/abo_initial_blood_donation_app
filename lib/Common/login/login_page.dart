@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 25,
               ),
               const Text(
-                "Numbar Varification",
+                "Numbar Verification",
                 style: TextStyle(
                   fontSize: 22.0,
                   fontWeight: FontWeight.bold,

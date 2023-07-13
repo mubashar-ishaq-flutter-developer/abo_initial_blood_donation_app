@@ -56,12 +56,12 @@ class _MapInitializationState extends State<MapInitialization> {
   BitmapDescriptor? activeNearbyIcon;
   List<ActiveNearbyAvailableDonors> onlineNearByAvailableDonorsList = [];
   bool activeNearbyDonorKeysLoaded = false;
-
-  DatabaseReference? refrenceDonateRequest;
+//turn off for testing
+  // DatabaseReference? refrenceDonateRequest;
 
   String donorAcceptStatus = "Donor is Coming";
 
-  StreamSubscription<DatabaseEvent>? tripRideRequestInfoStreamSubscription;
+  // StreamSubscription<DatabaseEvent>? tripRideRequestInfoStreamSubscription;
 
   String userDonateRequestStatus = "";
   bool requestPositionInfo = true;
@@ -94,6 +94,7 @@ class _MapInitializationState extends State<MapInitialization> {
         .ref()
         .child("All Seeker Donation Request")
         .push();
+    // refrenceDonateRequest!.set(gid!);
     var originLocation = Provider.of<AppInfo>(
       context,
       listen: false,
@@ -119,6 +120,11 @@ class _MapInitializationState extends State<MapInitialization> {
         refrenceDonateRequest!.onValue.listen((eventSnap) {
       if (eventSnap.snapshot.value == null) {
         return;
+      }
+      if ((eventSnap.snapshot.value as Map)["donorid"] != null) {
+        setState(() {
+          donorID = (eventSnap.snapshot.value as Map)["donorid"];
+        });
       }
       if ((eventSnap.snapshot.value as Map)["donorfName"] != null) {
         setState(() {
@@ -205,27 +211,23 @@ class _MapInitializationState extends State<MapInitialization> {
   }
 
   searchNearestOnlineDonors() async {
-    //cancel/delete Ride Information
     // refrenceDonateRequest!.remove();
     //when no online donor available
     if (onlineNearByAvailableDonorsList.isEmpty) {
-      // setState(() {
-      //   polyLineSet.clear();
-      //   markersSet.clear();
-      //   circlesSet.clear();
-      //   pLineCoOrdinatesList.clear();
-      // });
+      setState(() {
+        //   polyLineSet.clear();
+        markersSet.clear();
+        //   circlesSet.clear();
+        //   pLineCoOrdinatesList.clear();
+      });
 
       TostMessage().tostMessage(
           "No Online Nearest Driver Available. Search Again after some time.");
-      //cancel/delete Ride Information
+
       refrenceDonateRequest!.remove().then((value) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const HomePage(),
-          ),
-        );
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          SystemNavigator.pop();
+        });
         return;
       }).onError((FirebaseException exception, stackTrace) {
         TostMessage().tostMessage(exception.message);
@@ -272,20 +274,20 @@ class _MapInitializationState extends State<MapInitialization> {
               .child("donationStatus")
               .onValue
               .listen((eventSnapshot) {
-            //1.donor has cancel the rideRequest :: Push Notification
+            //1.donor has cancel the Request :: Push Notification
             //(donationStatus = idle)
             if (eventSnapshot.snapshot.value == "idle") {
               TostMessage().tostMessage(
                   "The donor has cancelled your request. Please choose another donor.");
               Future.delayed(const Duration(milliseconds: 2000), () {
-                // TostMessage().tostMessage("Please Restart App Now.");
-                // SystemNavigator.pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomePage(),
-                  ),
-                );
+                TostMessage().tostMessage("Restarting App Now...");
+                SystemNavigator.pop();
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const HomePage(),
+                //   ),
+                // );
               });
             }
             //2.donor has accept the rideRequest :: Push Notification
@@ -730,6 +732,13 @@ class _MapInitializationState extends State<MapInitialization> {
                             refrenceDonateRequest!.remove();
                             Future.delayed(const Duration(milliseconds: 2000),
                                 () {
+                              final dbRefrences = FirebaseDatabase.instance
+                                  .ref()
+                                  .child("Data")
+                                  .child(donorID);
+                              dbRefrences
+                                  .child("donationStatus")
+                                  .set("completed");
                               SystemNavigator.pop();
                             });
                           },

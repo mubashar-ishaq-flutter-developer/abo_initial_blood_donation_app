@@ -4,6 +4,7 @@ import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -334,6 +335,27 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
     dbRefrence.child("status").set("ended");
     streamSubscriptionDonorLivePosition!.cancel();
     Navigator.pop(context);
+    await closeApp();
+  }
+
+  closeApp() async {
+    String donationStatus = "";
+    final dbRefrences = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrences.child(gid!).onValue.listen((event) {
+      if (event.snapshot.value == null) {
+        return;
+      }
+      if ((event.snapshot.value as Map)["donationStatus"] != null) {
+        setState(() {
+          donationStatus = (event.snapshot.value as Map)["donationStatus"];
+        });
+      }
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        if (donationStatus == "completed") {
+          SystemNavigator.pop();
+        }
+      });
+    });
   }
 
   @override
