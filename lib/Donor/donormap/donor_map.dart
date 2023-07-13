@@ -149,11 +149,6 @@ class _DonorMapState extends State<DonorMap> {
                         statusText = "Now Offline";
                         isDonorActive = false;
                       });
-                      final user = FirebaseAuth.instance.currentUser;
-                      String? uid = user?.uid;
-                      final dbRefrence =
-                          FirebaseDatabase.instance.ref().child("activeDonors");
-                      dbRefrence.child(uid!).remove();
                       TostMessage().tostMessage("You are Offline Now");
                     }
                   },

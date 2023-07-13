@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:abo_initial/Common/homepage/home_page.dart';
 import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:abo_initial/Seeker/map/select_nearest_active_donors_screen.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,25 +44,24 @@ class _MapInitializationState extends State<MapInitialization> {
   Position? userCurrentPosition;
   //from geolocator
   var geoLocator = Geolocator();
-
   // LocationPermission? _locationPermission;
   double bottomPaddingOfMap = 0;
   //for polyline points
   List<LatLng> pLineCoOrdinatesList = [];
   Set<Polyline> polyLineSet = {};
   //for polyline markers
-  Set<Marker> markersSet = {};
-  Set<Circle> circlesSet = {};
+  Set<Marker> markersSet = <Marker>{};
+  Set<Circle> circlesSet = <Circle>{};
 
   BitmapDescriptor? activeNearbyIcon;
   List<ActiveNearbyAvailableDonors> onlineNearByAvailableDonorsList = [];
   bool activeNearbyDonorKeysLoaded = false;
-
-  DatabaseReference? refrenceDonateRequest;
+//turn off for testing
+  // DatabaseReference? refrenceDonateRequest;
 
   String donorAcceptStatus = "Donor is Coming";
 
-  StreamSubscription<DatabaseEvent>? tripRideRequestInfoStreamSubscription;
+  // StreamSubscription<DatabaseEvent>? tripRideRequestInfoStreamSubscription;
 
   String userDonateRequestStatus = "";
   bool requestPositionInfo = true;
@@ -93,6 +94,7 @@ class _MapInitializationState extends State<MapInitialization> {
         .ref()
         .child("All Seeker Donation Request")
         .push();
+    // refrenceDonateRequest!.set(gid!);
     var originLocation = Provider.of<AppInfo>(
       context,
       listen: false,
@@ -118,6 +120,11 @@ class _MapInitializationState extends State<MapInitialization> {
         refrenceDonateRequest!.onValue.listen((eventSnap) {
       if (eventSnap.snapshot.value == null) {
         return;
+      }
+      if ((eventSnap.snapshot.value as Map)["donorid"] != null) {
+        setState(() {
+          donorID = (eventSnap.snapshot.value as Map)["donorid"];
+        });
       }
       if ((eventSnap.snapshot.value as Map)["donorfName"] != null) {
         setState(() {
@@ -158,6 +165,8 @@ class _MapInitializationState extends State<MapInitialization> {
         //status = accepted
         if (userDonateRequestStatus == "accepted") {
           updateArrivalTimeToUserPickupLocation(driverCurrentPositionLatLng);
+          //for testing
+          // TostMessage().tostMessage("testing");
         }
 
         //status = arrived
@@ -202,25 +211,38 @@ class _MapInitializationState extends State<MapInitialization> {
   }
 
   searchNearestOnlineDonors() async {
-    //2. cancel the seeker request
+    // refrenceDonateRequest!.remove();
     //when no online donor available
     if (onlineNearByAvailableDonorsList.isEmpty) {
-      //cancel/delete Ride Information
-      refrenceDonateRequest!.remove();
       setState(() {
-        polyLineSet.clear();
+        //   polyLineSet.clear();
         markersSet.clear();
-        circlesSet.clear();
-        pLineCoOrdinatesList.clear();
+        //   circlesSet.clear();
+        //   pLineCoOrdinatesList.clear();
       });
 
       TostMessage().tostMessage(
-          "No Online Nearest Driver Available. Search Again after some time, Restarting App Now.");
+          "No Online Nearest Driver Available. Search Again after some time.");
 
-      Future.delayed(const Duration(milliseconds: 4000), () {
-        // MyApp.restartApp(context);
-        SystemNavigator.pop();
+      refrenceDonateRequest!.remove().then((value) {
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          SystemNavigator.pop();
+        });
+        return;
+      }).onError((FirebaseException exception, stackTrace) {
+        TostMessage().tostMessage(exception.message);
       });
+
+      // Future.delayed(const Duration(milliseconds: 1000), () {
+      //   // MyApp.restartApp(context);
+      //   // SystemNavigator.pop();
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(
+      //       builder: (context) => const HomePage(),
+      //     ),
+      //   );
+      // });
 
       return;
     }
@@ -252,14 +274,20 @@ class _MapInitializationState extends State<MapInitialization> {
               .child("donationStatus")
               .onValue
               .listen((eventSnapshot) {
-            //1.donor has cancel the rideRequest :: Push Notification
+            //1.donor has cancel the Request :: Push Notification
             //(donationStatus = idle)
             if (eventSnapshot.snapshot.value == "idle") {
               TostMessage().tostMessage(
                   "The donor has cancelled your request. Please choose another donor.");
-              Future.delayed(const Duration(milliseconds: 3000), () {
-                TostMessage().tostMessage("Please Restart App Now.");
+              Future.delayed(const Duration(milliseconds: 2000), () {
+                TostMessage().tostMessage("Restarting App Now...");
                 SystemNavigator.pop();
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const HomePage(),
+                //   ),
+                // );
               });
             }
             //2.donor has accept the rideRequest :: Push Notification
@@ -341,6 +369,18 @@ class _MapInitializationState extends State<MapInitialization> {
     }
   }
 
+  //for creating the image instead of marker
+  createActiveNearByDonorIconMarker() {
+    if (activeNearbyIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/origin.png")
+          .then((value) {
+        activeNearbyIcon = value;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     createActiveNearByDonorIconMarker();
@@ -369,7 +409,6 @@ class _MapInitializationState extends State<MapInitialization> {
               setState(() {
                 bottomPaddingOfMap = 225;
               });
-
               locateUserPosition();
             },
           ),
@@ -662,7 +701,9 @@ class _MapInitializationState extends State<MapInitialization> {
                         ElevatedButton.icon(
                           onPressed: () async {
                             final call = 'tel://$donorNumber';
+                            // ignore: deprecated_member_use
                             if (await canLaunch(call)) {
+                              // ignore: deprecated_member_use
                               await launch(call);
                             }
                           },
@@ -689,8 +730,15 @@ class _MapInitializationState extends State<MapInitialization> {
                         ElevatedButton.icon(
                           onPressed: () {
                             refrenceDonateRequest!.remove();
-                            Future.delayed(const Duration(milliseconds: 3000),
+                            Future.delayed(const Duration(milliseconds: 2000),
                                 () {
+                              final dbRefrences = FirebaseDatabase.instance
+                                  .ref()
+                                  .child("Data")
+                                  .child(donorID);
+                              dbRefrences
+                                  .child("donationStatus")
+                                  .set("completed");
                               SystemNavigator.pop();
                             });
                           },
@@ -945,18 +993,6 @@ class _MapInitializationState extends State<MapInitialization> {
       //set the state of donor
       setState(() {
         markersSet = donorsMarkerSet;
-      });
-    }
-  }
-
-  //for creating the image instead of marker
-  createActiveNearByDonorIconMarker() {
-    if (activeNearbyIcon == null) {
-      ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context, size: const Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/origin.png")
-          .then((value) {
-        activeNearbyIcon = value;
       });
     }
   }

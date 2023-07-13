@@ -33,7 +33,7 @@ class _OtpPageState extends State<OtpPage> {
       final user = FirebaseAuth.instance.currentUser;
       String? uid = user?.uid;
       final dbRefrence = FirebaseDatabase.instance.ref().child("Data");
-      dbRefrence.child(uid!).once().then((recodKey) {
+      dbRefrence.child(uid!).child("bloodgroup").once().then((recodKey) {
         final snap = recodKey.snapshot;
         if (snap.value != null) {
           Navigator.pushReplacement(
@@ -102,7 +102,7 @@ class _OtpPageState extends State<OtpPage> {
                 height: 10.0,
               ),
               const Text(
-                "Enter otp that is send at your number !",
+                "Enter OTP that is send at your number !",
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -139,7 +139,7 @@ class _OtpPageState extends State<OtpPage> {
                     ),
                   ),
                   child: const Text(
-                    "Varify OTP",
+                    "Verify OTP",
                   ),
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:abo_initial/Common/drawer/drawer_widget.dart';
+import 'package:abo_initial/Common/splashscreencheck/splash_screen.dart';
 import 'package:abo_initial/Seeker/map/map_initialization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -50,22 +51,30 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Home Page"),
       ),
       drawer: DrawerWidget(
-        onPressed: () {
+        onPressed: () async {
           setState(() {
             isvisible = !isvisible;
+            isDonorActive = !true;
           });
           saveVisibilityState(isvisible);
           final user = FirebaseAuth.instance.currentUser;
           String? uid = user?.uid;
           final dbRefrence =
               FirebaseDatabase.instance.ref().child("activeDonors");
-          dbRefrence.child(uid!).remove();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HomePage(),
-            ),
-          );
+          await dbRefrence.child(uid!).remove().then((value) {
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => const HomePage(),
+            //   ),
+            // );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SplashScreen(),
+              ),
+            );
+          });
         },
       ),
       body: Stack(

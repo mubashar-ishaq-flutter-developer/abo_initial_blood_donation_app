@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../tostmessage/tost_message.dart';
+import '../widget/progress_dialog.dart';
 import 'otp_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,16 +20,24 @@ class _LoginPageState extends State<LoginPage> {
 
   FirebaseAuth auth = FirebaseAuth.instance;
   sendOTP() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => const ProgressDialog(
+        message: "Please wait...",
+      ),
+    );
     await auth.verifyPhoneNumber(
       phoneNumber: completeNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         await auth.signInWithCredential(credential);
       },
       verificationFailed: (FirebaseAuthException e) {
+        Navigator.pop(context);
         TostMessage().tostMessage(e.message);
       },
       codeSent: (String? verificationId, int? resendToken) {
         LoginPage.varify = verificationId.toString();
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -36,7 +45,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       },
-      codeAutoRetrievalTimeout: (String verificationId) {},
+      codeAutoRetrievalTimeout: (String verificationId) {
+        LoginPage.varify = verificationId.toString();
+      },
     );
   }
 
@@ -67,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 25,
               ),
               const Text(
-                "Numbar Varification",
+                "Numbar Verification",
                 style: TextStyle(
                   fontSize: 22.0,
                   fontWeight: FontWeight.bold,
@@ -128,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: const Text(
-                    "Send Code",
+                    "Send OTP",
                   ),
                 ),
               ),

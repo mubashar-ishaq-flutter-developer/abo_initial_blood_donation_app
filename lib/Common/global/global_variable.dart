@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -39,7 +40,16 @@ DonorData onlineDonorData = DonorData();
 String cloudMessagingServerToken =
     "key=AAAApknoyQY:APA91bGEL2qxE6rlhNycLRaGFbO6GeDmDuWvXnQlw4KK8pXdQw15Mdb6vsLMmmsCegN_ltLbx2hxPirrxfVuBrb3RIQS0FWbXnvevJeaY23hXkT39yBr5rrLsSr40N82Khl6XfQuPqdC";
 String userPickUpLocation = "";
+String donorID = "";
 String donorFName = "";
 String donorLName = "";
 String donorBloodGroup = "";
 String donorNumber = "";
+//for seeker assistant method
+String? destinationAddress;
+// ignore: prefer_typing_uninitialized_variables
+var reponseNotification;
+//waiting
+StreamSubscription<DatabaseEvent>? tripRideRequestInfoStreamSubscription;
+//for testing
+DatabaseReference? refrenceDonateRequest;

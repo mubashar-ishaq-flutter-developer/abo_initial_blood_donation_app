@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'package:abo_initial/Common/global/global_variable.dart';
+import 'package:abo_initial/Common/tostmessage/tost_message.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../Common/assistant/assistant_methord.dart';
 import '../../Common/theme/map_theme.dart';
 import '../../Common/widget/progress_dialog.dart';
@@ -37,6 +41,8 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
   String rideRequestStatus = "accepted";
   String durationFromOriginToDestination = "";
   bool isRequestDirectionDetails = false;
+  //for testing
+  Polyline? polyline;
 
 //draw poly line
   Future<void> drawPolyLineFromOriginToDestination(
@@ -56,42 +62,85 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
 //polyline points
     PolylinePoints pPoints = PolylinePoints();
     //decoded polyline points
-
     List<PointLatLng> decodedPolyLinePointsResultList =
         pPoints.decodePolyline(directionDetailsInfo!.e_points!);
 
     polyLinePositionCoordinates.clear();
+    // Update the polyline points
+    List<LatLng> updatedPolyLinePositionCoordinates = [];
 
     if (decodedPolyLinePointsResultList.isNotEmpty) {
       //list accepts the polyline latlng
       for (var pointLatLng in decodedPolyLinePointsResultList) {
         //get the points
-        polyLinePositionCoordinates
+        updatedPolyLinePositionCoordinates
             .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
       }
     }
 
     setOfPolynine.clear();
-
-    setState(() {
-      Polyline polyline = Polyline(
-        //color of polyline
-        color: Colors.purpleAccent,
-        //for same id
-        polylineId: const PolylineId("PolylineID"),
-        //joint the points
-        jointType: JointType.round,
-        //joint the points
-        points: polyLinePositionCoordinates,
-        //from destination position
-        startCap: Cap.roundCap,
-        //ended with round cap
-        endCap: Cap.roundCap,
-        geodesic: true,
-      );
-      //define the property polyline for each point
-      setOfPolynine.add(polyline);
-    });
+    if (polyline != null) {
+      if (!listEquals(polyline!.points, updatedPolyLinePositionCoordinates)) {
+        setState(() {
+          polyline = Polyline(
+            //color of polyline
+            color: Colors.purpleAccent,
+            //for same id
+            polylineId: const PolylineId("PolylineID"),
+            //joint the points
+            jointType: JointType.round,
+            //joint the points
+            points: updatedPolyLinePositionCoordinates,
+            //from destination position
+            startCap: Cap.roundCap,
+            //ended with round cap
+            endCap: Cap.roundCap,
+            geodesic: true,
+          );
+          //define the property polyline for each point
+          setOfPolynine.add(polyline!);
+        });
+      }
+    } else {
+      setState(() {
+        polyline = Polyline(
+          //color of polyline
+          color: Colors.purpleAccent,
+          //for same id
+          polylineId: const PolylineId("PolylineID"),
+          //joint the points
+          jointType: JointType.round,
+          //joint the points
+          points: updatedPolyLinePositionCoordinates,
+          //from destination position
+          startCap: Cap.roundCap,
+          //ended with round cap
+          endCap: Cap.roundCap,
+          geodesic: true,
+        );
+        //define the property polyline for each point
+        setOfPolynine.add(polyline!);
+      });
+    }
+    // setState(() {
+    //   Polyline polyline = Polyline(
+    //     //color of polyline
+    //     color: Colors.purpleAccent,
+    //     //for same id
+    //     polylineId: const PolylineId("PolylineID"),
+    //     //joint the points
+    //     jointType: JointType.round,
+    //     //joint the points
+    //     points: polyLinePositionCoordinates,
+    //     //from destination position
+    //     startCap: Cap.roundCap,
+    //     //ended with round cap
+    //     endCap: Cap.roundCap,
+    //     geodesic: true,
+    //   );
+    //   //define the property polyline for each point
+    //   setOfPolynine.add(polyline);
+    // });
     //adjust the maps according to the lines
     LatLngBounds boundsLatLng;
     if (originLatLng.latitude > destinationLatLng.latitude &&
@@ -221,6 +270,27 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
   }
 
   updateDurationTimeAtRealTime() async {
+    // var originLatLng;
+    // //fot testing purpose will it be able to change estimated time
+    // final refrenceDonateRequest =
+    //     FirebaseDatabase.instance.ref().child("All Seeker Donation Request");
+    // refrenceDonateRequest.onValue.listen((eventSnap) {
+    //   if (eventSnap.snapshot.value == null) {
+    //     return;
+    //   }
+    //   if ((eventSnap.snapshot.value as Map)["donorLocation"] != null) {
+    //     double donorCurrentPositionLatitude = double.parse(
+    //         (eventSnap.snapshot.value as Map)["donorLocation"]["latitude"]
+    //             .toString());
+    //     double donorCurrentPositionLongitude = double.parse(
+    //         (eventSnap.snapshot.value as Map)["donorLocation"]["longitude"]
+    //             .toString());
+    //     originLatLng =
+    //         LatLng(donorCurrentPositionLatitude, donorCurrentPositionLongitude);
+    //   }
+    // });
+
+    //original use to get user cuttent position but commit for testing purpose
     if (isRequestDirectionDetails == false) {
       isRequestDirectionDetails = true;
       if (onlineDonorCurrentPosition == null) {
@@ -243,6 +313,8 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
         setState(() {
           durationFromOriginToDestination = directionInformation.duration_text!;
         });
+      } else {
+        TostMessage().tostMessage("error occur while displaying time");
       }
       isRequestDirectionDetails = false;
     }
@@ -263,6 +335,27 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
     dbRefrence.child("status").set("ended");
     streamSubscriptionDonorLivePosition!.cancel();
     Navigator.pop(context);
+    await closeApp();
+  }
+
+  closeApp() async {
+    String donationStatus = "";
+    final dbRefrences = FirebaseDatabase.instance.ref().child("Data");
+    dbRefrences.child(gid!).onValue.listen((event) {
+      if (event.snapshot.value == null) {
+        return;
+      }
+      if ((event.snapshot.value as Map)["donationStatus"] != null) {
+        setState(() {
+          donationStatus = (event.snapshot.value as Map)["donationStatus"];
+        });
+      }
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        if (donationStatus == "completed") {
+          SystemNavigator.pop();
+        }
+      });
+    });
   }
 
   @override
@@ -291,6 +384,30 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
               });
               //for black theme importring from theme common
               blackThemeGoogleMap(newJourneyGoogleMapController);
+              // var donorCurrentLatLng;
+              //fot testing purpose will it be able to change estimated time
+              // final refrenceDonateRequest = FirebaseDatabase.instance
+              //     .ref()
+              //     .child("All Seeker Donation Request");
+              // refrenceDonateRequest.onValue.listen((eventSnap) {
+              //   if (eventSnap.snapshot.value == null) {
+              //     return;
+              //   }
+              //   if ((eventSnap.snapshot.value as Map)["donorLocation"] !=
+              //       null) {
+              //     double donorCurrentPositionLatitude = double.parse(
+              //         (eventSnap.snapshot.value as Map)["donorLocation"]
+              //                 ["latitude"]
+              //             .toString());
+              //     double donorCurrentPositionLongitude = double.parse(
+              //         (eventSnap.snapshot.value as Map)["donorLocation"]
+              //                 ["longitude"]
+              //             .toString());
+              //     donorCurrentLatLng = LatLng(donorCurrentPositionLatitude,
+              //         donorCurrentPositionLongitude);
+              //   }
+              // });
+              //for testing purpose it off
               var donorCurrentLatLng = LatLng(donorCurrentPosition!.latitude,
                   donorCurrentPosition!.longitude);
               var seekerOriginLatLng =
@@ -327,7 +444,7 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
                 child: Column(
                   children: [
                     Text(
-                      durationFromOriginToDestination,
+                      "Estimated Time $durationFromOriginToDestination",
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -401,20 +518,55 @@ class _NewJourneyScreenState extends State<NewJourneyScreen> {
                     const SizedBox(
                       height: 12,
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        endTripNow();
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green),
-                      icon: const Icon(Icons.directions_walk_rounded),
-                      label: const Text(
-                        "Arrived",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    Center(
+                      child: Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              endTripNow();
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red),
+                            icon: const Icon(Icons.directions_walk_rounded),
+                            label: const Text(
+                              "Arrived",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final call =
+                                  'tel://${widget.seekerDonateRequestDetails!.number}';
+                              // ignore: deprecated_member_use
+                              if (await canLaunch(call)) {
+                                // ignore: deprecated_member_use
+                                await launch(call);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                            icon: const Icon(
+                              Icons.call,
+                              color: Colors.black54,
+                              size: 22,
+                            ),
+                            label: const Text(
+                              "Call Seeker",
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

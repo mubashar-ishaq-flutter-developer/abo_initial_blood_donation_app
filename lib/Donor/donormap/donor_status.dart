@@ -69,6 +69,10 @@ class DonorStatus {
     dbRefrence.remove();
     dbRefrence = null;
     Future.delayed(const Duration(milliseconds: 2000), () {
+      final user = FirebaseAuth.instance.currentUser;
+      String? uid = user?.uid;
+      final dbRefrence = FirebaseDatabase.instance.ref().child("activeDonors");
+      dbRefrence.child(uid!).remove();
       //SystemChannels.platform.invokeMethod("SystemNavigator.pop");
       SystemNavigator.pop();
     });
