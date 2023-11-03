@@ -1,6 +1,6 @@
 # abo_initial
 
-A new Flutter project.
+A blood donation application where seeker select available donor if donor accept the request of seeker then both get each other location. This app is like taxi booking app.
 
 ## Getting Started
 
@@ -8,7 +8,7 @@ This project is a starting point for a Flutter application.
 
 A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Lab: ABOSpotter(A blood donation application)](https://docs.flutter.dev/get-started/codelab)
 - [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
 For help getting started with Flutter development, view the
